@@ -1,0 +1,12 @@
+config.local.php
+error_log.txt
+*.log
+.env
+.ftp-deploy-sync-state.json
+uploads/pdfs/*
+uploads/covers/*
+upload/profile/*
+!uploads/pdfs/.htaccess
+!uploads/covers/.htaccess
+!upload/profile/.htaccess
+!**/index.html

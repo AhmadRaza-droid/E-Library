@@ -1,0 +1,36 @@
+# ========== ERROR DOCUMENTS ==========
+ErrorDocument 404 /404.php
+ErrorDocument 403 /404.php
+ErrorDocument 500 /404.php
+
+# ========== BLOCK DIRECT ACCESS TO INTERNAL FILES ==========
+<FilesMatch "^(config\.php|config\.local\.php|config\.local\.example\.php|helpers\.php|mailer\.php|session_init\.php|session_timeout\.php|maintenance_check\.php|error_log\.txt|.*\.sql|.*\.md|.*\.log)$">
+    <IfModule mod_authz_core.c>
+        Require all denied
+    </IfModule>
+    <IfModule !mod_authz_core.c>
+        Order allow,deny
+        Deny from all
+    </IfModule>
+</FilesMatch>
+
+# hidden files (.git, .env, .htaccess ...)
+<FilesMatch "^\.">
+    <IfModule mod_authz_core.c>
+        Require all denied
+    </IfModule>
+    <IfModule !mod_authz_core.c>
+        Order allow,deny
+        Deny from all
+    </IfModule>
+</FilesMatch>
+
+# ========== BLOCK DIRECTORY LISTING ==========
+Options -Indexes
+
+# Security headers are sent from config.php (works even without mod_headers).
+
+# ========== REDIRECT TO HTTPS (uncomment once SSL works on your host) ==========
+# RewriteEngine On
+# RewriteCond %{HTTPS} off
+# RewriteRule ^(.*)$ https://%{HTTP_HOST}/$1 [R=301,L]
