@@ -1,0 +1,17 @@
+# Local secrets and environment configuration
+/config.local.php
+/.env
+/.env.*
+!.env.example
+
+# Composer-installed dependencies (install on deployment)
+/vendor/
+
+# Runtime logs and temporary files
+/error_log.txt
+*.log
+*.tmp
+
+# User-uploaded content and backups (keep deployment data out of Git)
+/uploads/
+/backups/
