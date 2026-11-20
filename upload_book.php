@@ -58,6 +58,11 @@ if (isset($_POST['upload'])) {
 
         $savedPdfs = [];
         $inserted = 0;
+        $transactionStarted = false;
+        if ($error === '') {
+            $transactionStarted = $conn->begin_transaction();
+            if (!$transactionStarted) $error = 'Could not start the database upload safely.';
+        }
         if ($error === '') {
             foreach ($files as $file) {
                 $fileName = (string)($file['name'] ?? '');
@@ -86,7 +91,11 @@ if (isset($_POST['upload'])) {
             }
         }
 
+        if ($error === '' && $inserted > 0 && !$conn->commit()) {
+            $error = 'Could not finish saving the uploaded books.';
+        }
         if ($error !== '') {
+            if ($transactionStarted) $conn->rollback();
             foreach ($savedPdfs as $path) @unlink(__DIR__ . '/' . $path);
             if ($coverPath !== '') @unlink(__DIR__ . '/' . $coverPath);
         } elseif ($inserted > 0) {
