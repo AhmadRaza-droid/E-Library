@@ -39,7 +39,7 @@ $result = db_query($conn, "SELECT * FROM books $where ORDER BY id DESC LIMIT $li
 <head>
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Books - <?php echo e(site_name($conn)); ?></title>
-    <link rel="stylesheet" href="style.css?v=2404">
+    <link rel="stylesheet" href="style.css?v=2405">
 </head>
 
 <body>
@@ -128,7 +128,16 @@ while($row = mysqli_fetch_assoc($result)){
 
 <div class="book-card">
 
-<img src="<?php echo e(safe_url($row['cover_image_url'])); ?>" alt="Book Cover">
+<?php
+$coverPath = safe_url($row['cover_image_url'] ?? '');
+if ($coverPath === '') $coverPath = safe_url($row['cover_file'] ?? '');
+?>
+<?php if ($coverPath !== ''): ?>
+<img src="<?php echo e($coverPath); ?>" alt="Cover of <?php echo e($row['title'] ?? 'book'); ?>" loading="lazy" onerror="this.hidden=true;this.nextElementSibling.hidden=false;">
+<div class="book-cover-fallback" hidden aria-label="No cover available">📚</div>
+<?php else: ?>
+<div class="book-cover-fallback" aria-label="No cover available">📚</div>
+<?php endif; ?>
 
 <h3><?php echo htmlspecialchars($row['title']); ?></h3>
 
