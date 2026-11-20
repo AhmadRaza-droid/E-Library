@@ -9,7 +9,13 @@ if(isset($_GET['id'])){
 
     if($book){
 
-        $downloadLink = resolve_download_link($book['download_epub_link']);
+        // Project Gutenberg SQL imports contain the Gutenberg ID in books.id, not download_epub_link.
+        // Use the ID as a fallback for imported catalog entries.
+        $downloadValue = trim((string)($book['download_epub_link'] ?? ''));
+        if ($downloadValue === '' && (int)$book['id'] > 0) {
+            $downloadValue = (string)(int)$book['id'];
+        }
+        $downloadLink = resolve_download_link($downloadValue);
         if($downloadLink === ''){
             js_alert_redirect('Sorry, no download is available for this book.', 'books.php');
         }
