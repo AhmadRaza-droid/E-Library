@@ -255,7 +255,7 @@ if(isset($_GET['id'])){
     </div>
     
     <p class=\"info-text\">
-        EPUB files open automatically in apps like:<br>
+        Book files can be opened in compatible reading apps:<br>
         <span style=\"color:#0b1f3a;font-weight:bold;\">
         📱 Google Play Books • 📖 Adobe Digital Editions • 📚 Apple Books
         </span>
@@ -272,7 +272,7 @@ if(isset($_GET['id'])){
     
     <div class=\"btn-group\">
         <a href=\"$downloadLink\" target=\"_blank\">
-            <button class=\"btn-download-now\">📥 Download EPUB</button>
+            <button class=\"btn-download-now\">📥 Download Book File</button>
         </a>
     </div>
     
