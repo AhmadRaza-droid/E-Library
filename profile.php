@@ -51,7 +51,7 @@ $settings = get_settings($conn);
 <html>
 <head>
     <title>My Profile - <?php echo e(site_name($conn)); ?></title>
-    <link rel="stylesheet" href="style.css?v=2404">
+    <link rel="stylesheet" href="style.css?v=2405">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <style>
         * {
@@ -394,11 +394,19 @@ $settings = get_settings($conn);
 
         <!-- Profile Picture -->
         <div class="profile-pic">
-            <?php if(isset($user['profile_image']) && $user['profile_image'] != ""){ ?>
-                <img src="<?php echo e($user['profile_image']); ?>" alt="Profile Picture">
-            <?php } else { ?>
+            <?php
+            $profileImage = trim((string)($user['profile_image'] ?? ''));
+            $profileImageIsLocal = (bool)preg_match('#^upload/profile/[A-Za-z0-9._\\-]+$#', $profileImage);
+            $profileImageUrl = $profileImageIsLocal
+                ? (is_file(__DIR__ . '/' . $profileImage) ? $profileImage . '?v=' . (string)filemtime(__DIR__ . '/' . $profileImage) : '')
+                : safe_url($profileImage);
+            ?>
+            <?php if ($profileImageUrl !== ''): ?>
+                <img src="<?php echo e($profileImageUrl); ?>" alt="Profile Picture" onerror="this.hidden=true;this.nextElementSibling.hidden=false;">
+                <div class="default-icon" hidden>👤</div>
+            <?php else: ?>
                 <div class="default-icon">👤</div>
-            <?php } ?>
+            <?php endif; ?>
         </div>
 
         <!-- Upload Profile Picture -->
