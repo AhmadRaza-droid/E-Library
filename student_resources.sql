@@ -1,0 +1,21 @@
+CREATE TABLE IF NOT EXISTS student_resources (
+  id INT AUTO_INCREMENT PRIMARY KEY,
+  user_id INT NOT NULL,
+  title VARCHAR(180) NOT NULL,
+  university VARCHAR(180) NOT NULL,
+  course VARCHAR(180) NOT NULL,
+  subject VARCHAR(180) NOT NULL,
+  description TEXT NOT NULL,
+  original_name VARCHAR(180) NOT NULL,
+  storage_key VARCHAR(52) NOT NULL,
+  file_ext VARCHAR(8) NOT NULL,
+  size_bytes INT UNSIGNED NOT NULL,
+  status VARCHAR(20) NOT NULL DEFAULT 'pending',
+  review_note VARCHAR(1000) NOT NULL DEFAULT '',
+  reviewed_by INT DEFAULT NULL,
+  reviewed_at DATETIME DEFAULT NULL,
+  created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+  UNIQUE KEY uq_resource_storage (storage_key),
+  KEY idx_resource_status (status, id),
+  KEY idx_resource_user (user_id, id)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;

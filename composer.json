@@ -1,0 +1,13 @@
+{
+    "name": "ahmadraza-droid/e-library",
+    "description": "PHP and MySQL electronic library",
+    "type": "project",
+    "require": {
+        "php": ">=8.1",
+        "ext-mysqli": "*",
+        "ext-mbstring": "*",
+        "ext-fileinfo": "*",
+        "ext-openssl": "*",
+        "phpmailer/phpmailer": "^7.0"
+    }
+}
