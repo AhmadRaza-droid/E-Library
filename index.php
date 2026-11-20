@@ -336,67 +336,78 @@ function sendMessage(event){
 }
 
 function getBotReply(message){
-    const text = message.toLowerCase().trim();
-    if (/^(hi|hello|hey|salam|assalam ?o ?alaikum|assalamu ?alaikum)[!?. ]*$/.test(text))
-        return {text: '👋 Hello! Ask for a book, author, category, or help with the library.'};
-    if (/\b(download|download kar)/.test(text))
-        return {text: '⬇ Open Books, choose a book and use Download EPUB if it is available.'};
-    if (/\b(login|log in|sign in)/.test(text))
-        return {text: '🔐 Open Login and enter your email and password. Use Forgot Password if needed.'};
-    if (/\b(register|registration|sign ?up)/.test(text))
-        return {text: '📝 Open Register, fill in your details and verify your email with the OTP.'};
-    if (/\b(favou?rite|pasandida)/.test(text))
-        return {text: '❤️ Log in and add a book to Favorites. You can find it in your Profile.'};
-    if (/\b(review|rating)/.test(text))
-        return {text: '⭐ You can rate books and write reviews on the Books page.'};
-    if (/\b(admin|administrator)/.test(text))
-        return {text: '🛡 An authorized admin can manage the library from Admin Panel.'};
-    if (/\b(dark mode|light mode|theme)/.test(text))
-        return {text: '🌙 Use the Dark button in the navigation bar to change the theme.'};
-    if (/\b(contact|rabta)/.test(text))
-        return {text: '✉️ Open the Contact page to send a message to the library team.'};
+    const raw = String(message || '').trim();
+    const text = raw.toLocaleLowerCase().replace(/[’‘]/g, "'").replace(/\s+/g, ' ');
+    if (!text) return {text: 'Please type a question. Aap kitab ka naam, author ya apna sawal likhein.'};
+
+    const has = pattern => pattern.test(text);
+    const faqs = [
+        {test: /\b(hi|hello|hey|salam|assalam ?o ?alaikum|assalamu ?alaikum)\b/, answer: '👋 Wa Alaikum Assalam! Main Library Assistant hoon. Aap books, authors, categories, reading, downloads, account aur library features ke bare mein pooch sakte hain.'},
+        {test: /\b(download|download kar|epub|pdf)\b/, answer: '⬇ Book download karne ke liye Books page kholein, book select karein aur Download option check karein. Download sirf un books ke liye available hota hai jinka valid file/link library mein mojood ho.'},
+        {test: /\b(read|reading|parhna|parhun|parhney|online book)\b/, answer: '📖 Books page par book select karein aur Read button dabayein. Agar Read option kaam na kare to mumkin hai us book ka reading link available na ho.'},
+        {test: /\b(login|log in|sign in|password|forgot password)\b/, answer: '🔐 Login page par apna registered email aur password enter karein. Password yaad na ho to Forgot Password use karein.'},
+        {test: /\b(register|registration|sign ?up|account banao|account banana)\b/, answer: '📝 Register page kholein, apni details fill karein aur email verification/OTP complete karein. Phir login kar sakte hain.'},
+        {test: /\b(favou?rite|favourite|pasandida|bookmark|save book)\b/, answer: '❤️ Account mein login karein. Book ke Favorites/Bookmark option se save karein; saved books Profile ya Library section mein mil sakti hain.'},
+        {test: /\b(review|rating|rate|stars)\b/, answer: '⭐ Book details/page par rating select karein aur apna review submit karein. Review dene ke liye login zaroori ho sakta hai.'},
+        {test: /\b(admin|administrator|admin panel)\b/, answer: '🛡 Admin Panel sirf verified admin account ke liye hai. Admin books, users, categories, messages, notifications aur student materials manage kar sakta hai.'},
+        {test: /\b(dark mode|light mode|theme|night mode)\b/, answer: '🌙 Navigation bar mein Dark button use karke dark aur light theme switch karein. Theme browser mein save hoti hai.'},
+        {test: /\b(contact|rabta|message|support|help)\b/, answer: '✉️ Library team se rabta karne ke liye Contact page open karein aur apna message submit karein.'},
+        {test: /\b(category|categories|subject|subjects|kis qisam)\b/, answer: '📚 Books ko subject/category ke hisaab se browse karne ke liye Books page ya home page ka Browse by subject section use karein.'},
+        {test: /\b(request|mangwa|mangwana|book chahiye|suggest a book)\b/, answer: '📩 Agar required book library mein nahi milti to Book Request option/page check karein aur book ka naam submit karein.'},
+        {test: /\b(otp|verification|verify email|email verify)\b/, answer: '📨 Registration ke baad apni email inbox aur spam folder check karein. OTP na aaye to kuch dair baad resend option try karein.'}
+    ];
+    for (const item of faqs) if (item.test.test(text)) return {text: item.answer};
 
     const categories = {
         horror: ['horror','vampire','dracula','frankenstein','ghost','gothic'],
         novel: ['novel','fiction'], science: ['science','scientist','physics','chemistry','biology'],
-        adventure: ['adventure','treasure','pirate'], detective: ['detective','sherlock','holmes','crime'],
+        adventure: ['adventure','treasure','pirate'], detective: ['detective','sherlock','holmes','crime','mystery'],
         history: ['history','historical'], children: ['children','child','kids'],
         fantasy: ['fantasy','magic'], poetry: ['poetry','poem','poems'],
-        romance: ['romance'], programming: ['programming','coding','computer','software','python','java'],
+        romance: ['romance','love story'], programming: ['programming','coding','computer','software','python','java'],
         islamic: ['islamic','islam'], urdu: ['urdu']
     };
-    const stop = new Set(['the','and','for','with','about','tell','what','which','who','can','you','please','find','show','some','give','book','books','author','writer','mujhe','mujhay','koi','kisi','batao','batain','bata','hai','hain','kya','wala','wali','chahiye','par','aur','kay','mein','mere','mera','kiye','ki','ka','ke','ko','se','say','karo','chahye','kitab','kitaben','kitaab','suggest','recommend','recommendation']);
+    const stop = new Set(['the','and','for','with','about','tell','what','which','who','can','you','please','find','show','some','give','book','books','author','writer','mujhe','mujhay','koi','kisi','batao','batain','bata','hai','hain','kya','wala','wali','chahiye','par','aur','kay','mein','mere','mera','kiye','ki','ka','ke','ko','se','say','karo','chahye','kitab','kitaben','kitaab','suggest','recommend','recommendation','dikhao','do','hain']);
     const words = (text.match(/[\p{L}\p{N}]+/gu) || []).filter(word => word.length > 1 && !stop.has(word));
-    if (words.length === 0 && /\b(book|books|kitab|kitaben|kitaab|suggest|recommend)\b/.test(text)) {
-        return bookData.length
-            ? {text: '📚 Here are some books to explore:', books: bookData.slice(0, 5)}
-            : {text: 'There are no books in the library yet.'};
+    const wantsBooks = /\b(book|books|kitab|kitaben|kitaab|recommend|suggest|novel)\b/.test(text);
+    if (wantsBooks && words.length === 0) {
+        return bookData.length ? {text: '📚 Library mein ye books available hain:', books: bookData.slice(0, 5)} : {text: 'Abhi library mein books available nahi hain.'};
     }
-    const chosenCategory = Object.keys(categories).find(category => words.includes(category));
-    const terms = chosenCategory ? categories[chosenCategory] : words;
-    const matches = bookData.map(book => {
-        const title = String(book.title || '').toLowerCase();
-        const author = String(book.author || '').toLowerCase();
-        const details = String(book.category || '').toLowerCase() + ' ' + String(book.description || '').toLowerCase();
-        let score = 0;
-        terms.forEach(word => {
-            if (title.includes(word)) score += 5;
-            else if (author.includes(word)) score += 4;
-            else if (details.includes(word)) score += 1;
-        });
-        return {book, score};
-    }).filter(item => item.score > 0).sort((a, b) => b.score - a.score);
-    if (!matches.length) {
-        return {text: 'I could not find a matching book. Try a title, author or category, or browse the Books page.'};
-    }
-    const best = matches[0].book;
-    const title = String(best.title || '').toLowerCase();
-    const exactTitle = title.length > 3 && text.includes(title);
-    const description = exactTitle && best.description ? '\n' + String(best.description) : '';
-    return {text: (exactTitle ? '📚 Here is what I found:' : '📚 Recommended books:') + description,
-            books: matches.slice(0, 5).map(item => item.book)};
-}
 
+    const selectedCategory = Object.keys(categories).find(key =>
+        categories[key].some(term => text.includes(term)) || text.includes(key)
+    );
+    const searchTerms = selectedCategory ? categories[selectedCategory] : words;
+    const scored = bookData.map(book => {
+        const title = String(book.title || '').toLocaleLowerCase();
+        const author = String(book.author || '').toLocaleLowerCase();
+        const category = String(book.category || '').toLocaleLowerCase();
+        const description = String(book.description || '').toLocaleLowerCase();
+        let score = 0;
+        if (title && text.includes(title)) score += 20;
+        if (author && text.includes(author)) score += 14;
+        for (const term of searchTerms) {
+            if (term.length < 2) continue;
+            if (title.includes(term)) score += 7;
+            if (author.includes(term)) score += 5;
+            if (category.includes(term)) score += 4;
+            if (description.includes(term)) score += 1;
+        }
+        if (selectedCategory && (category.includes(selectedCategory) || categories[selectedCategory].some(t => category.includes(t)))) score += 6;
+        return {book, score};
+    }).filter(item => item.score > 0).sort((a, b) => b.score - a.score || String(a.book.title).localeCompare(String(b.book.title)));
+
+    if (!scored.length) {
+        return {text: selectedCategory
+            ? 'Is category ki matching book abhi nahi mili. Aap Books page par tamam books browse kar sakte hain ya kisi specific title/author ka naam try karein.'
+            : 'Mujhe is sawal ka exact jawab library data mein nahi mila. Aap book ka title, author ya category likh kar search karein. Website help ke liye login, register, download, read, bookmark ya contact pooch sakte hain.'};
+    }
+    const results = scored.slice(0, 5).map(item => item.book);
+    const exact = scored[0].score >= 20;
+    const intro = selectedCategory ? '📚 ' + selectedCategory.charAt(0).toUpperCase() + selectedCategory.slice(1) + ' category se matching books:' :
+        (exact ? '📖 Aapki search se ye book mili:' : '📚 Aapke sawal se milti-julti books:');
+    return {text: intro, books: results};
+}
 function toggleDarkMode(){
     document.body.classList.toggle("dark-mode");
     if(document.body.classList.contains("dark-mode")){
