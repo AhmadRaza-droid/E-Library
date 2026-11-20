@@ -157,6 +157,8 @@ $total_books      = (int)db_value($conn, "SELECT COUNT(*) FROM books", '', [], 0
 $total_reviews    = (int)db_value($conn, "SELECT COUNT(*) FROM reviews", '', [], 0);
 $total_categories = (int)db_value($conn, "SELECT COUNT(*) FROM categories", '', [], 0);
 $total_downloads  = (int)db_value($conn, "SELECT COALESCE(SUM(download_count),0) FROM books", '', [], 0);
+$verified_users   = (int)db_value($conn, "SELECT COUNT(*) FROM users WHERE is_verified=1", '', [], 0);
+$pending_requests = (int)db_value($conn, "SELECT COUNT(*) FROM book_requests WHERE status='Pending'", '', [], 0);
 
 $most_downloaded = mysqli_query($conn, "SELECT title, download_count FROM books ORDER BY download_count DESC LIMIT 5");
 $most_favorites  = mysqli_query($conn,
@@ -197,6 +199,14 @@ $book_requests = mysqli_query($conn,
         .top-bar h2 { color: #0b1f3a; }
         .dark-btn { background: #0b1f3a; color: white; padding: 8px 15px; border: none; border-radius: 5px; cursor: pointer; }
         .stats-container { display: flex; gap: 20px; flex-wrap: wrap; margin-bottom: 30px; }
+        .stat-card { flex: 1 1 190px; min-width: 0; }
+        .stat-card h1 { overflow-wrap: anywhere; }
+        .quick-action-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(170px, 1fr)); gap: 12px; }
+        .quick-action-grid a { display: flex; align-items: center; min-height: 48px; padding: 12px 14px; border-radius: 9px; background: #f1f5f9; color: #0b1f3a; text-decoration: none; font-weight: 600; border: 1px solid #e2e8f0; }
+        .quick-action-grid a:hover, .quick-action-grid a:focus { background: #e3edf7; border-color: #8aa9c8; outline: 2px solid transparent; }
+        body.dark-mode .quick-action-grid a { background: #202d46; color: #f5f7fb; border-color: #34435e; }
+        body.dark-mode .quick-action-grid a:hover, body.dark-mode .quick-action-grid a:focus { background: #2b3b59; }
+
         .stat-card { background: white; padding: 20px; border-radius: 10px; width: 220px; box-shadow: 0 2px 5px rgba(0,0,0,0.05); }
         .stat-card h2 { color: #666; font-size: 14px; margin-bottom: 10px; }
         .stat-card h1 { color: #0b1f3a; font-size: 32px; }
@@ -268,6 +278,20 @@ $book_requests = mysqli_query($conn,
         <div class="stat-card"><h2>Total Categories</h2><h1><?php echo $total_categories; ?></h1></div>
         <div class="stat-card"><h2>Total Reviews</h2><h1><?php echo $total_reviews; ?></h1></div>
         <div class="stat-card"><h2>Total Downloads</h2><h1><?php echo $total_downloads; ?></h1></div>
+        <div class="stat-card"><h2>Verified Users</h2><h1><?php echo $verified_users; ?></h1></div>
+        <div class="stat-card"><h2>Pending Book Requests</h2><h1><?php echo $pending_requests; ?></h1></div>
+    </div>
+
+    <div class="table-section admin-quick-actions">
+        <h2>Quick Actions</h2>
+        <div class="quick-action-grid">
+            <a href="admin_dashboard.php?page=add_book">＋ Add a Book</a>
+            <a href="admin_dashboard.php?page=all_books">📚 Manage Books</a>
+            <a href="admin_dashboard.php?page=all_users">👥 Manage Users</a>
+            <a href="admin_dashboard.php?page=book_requests">📝 Review Book Requests</a>
+            <a href="admin_resources.php">📂 Student Materials</a>
+            <a href="admin_analytics.php">📊 View Analytics</a>
+        </div>
     </div>
 
     <div class="table-section">
