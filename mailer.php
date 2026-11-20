@@ -4,7 +4,11 @@
 // =====================================================================
 use PHPMailer\PHPMailer\PHPMailer;
 
-require_once __DIR__ . '/vendor/autoload.php';
+// Avoid a fatal error when Composer dependencies have not been uploaded yet.
+$phpMailerAutoload = __DIR__ . '/vendor/autoload.php';
+if (is_file($phpMailerAutoload)) {
+    require_once $phpMailerAutoload;
+}
 
 function make_mailer($keepAlive = false){
     $m = new PHPMailer(true);
@@ -25,6 +29,10 @@ function make_mailer($keepAlive = false){
 /** Sends one HTML mail. Returns true/false (never throws, never prints). */
 function send_mail($to, $toName, $subject, $html, $alt = '', $replyTo = null, $replyName = ''){
     try {
+        if (!class_exists(PHPMailer::class)) {
+            error_log('Mail unavailable: PHPMailer is missing. Run composer install and upload vendor/.');
+            return false;
+        }
         $m = make_mailer();
         $m->addAddress($to, $toName);
         if ($replyTo && validate_email($replyTo)) { $m->addReplyTo($replyTo, $replyName); }
