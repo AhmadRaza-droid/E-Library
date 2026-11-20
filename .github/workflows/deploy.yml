@@ -22,8 +22,8 @@ jobs:
         uses: SamKirkland/FTP-Deploy-Action@v4.3.5
         with:
           server: ftpupload.net
-          username: ${{ secrets.FTP_USERNAME }}
-          password: ${{ secrets.FTP_PASSWORD }}
+          username: ${{ if0_43214721 }}
+          password: ${{ IsfMwAgPP9BEzA}}
           protocol: ftp
           port: 21
           server-dir: /htdocs/
