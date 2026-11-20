@@ -29,7 +29,7 @@ $topRated = mysqli_query($conn,
 // data for the on-page chatbot (descriptions trimmed so the page stays small)
 $heroBooks = db_all($conn, "SELECT title, author FROM books ORDER BY id DESC LIMIT 3");
 $subjectRows = db_all($conn, "SELECT category, COUNT(*) AS total FROM books WHERE category IS NOT NULL AND TRIM(category) <> '' GROUP BY category ORDER BY total DESC, category LIMIT 6");
-$chatRows = db_all($conn, "SELECT id, title, author, SUBSTRING(description, 1, 300) AS description, category FROM books ORDER BY id LIMIT 1000");
+$chatRows = db_all($conn, "SELECT id, title, author, SUBSTRING(description, 1, 300) AS description, category FROM books ORDER BY id DESC LIMIT 500");
 ?>
 <!DOCTYPE html>
 <html lang="en">
@@ -37,7 +37,7 @@ $chatRows = db_all($conn, "SELECT id, title, author, SUBSTRING(description, 1, 3
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title><?php echo htmlspecialchars($settings['site_name'] ?? 'Library Management System'); ?></title>
-<link rel="stylesheet" href="style.css?v=2404">
+<link rel="stylesheet" href="style.css?v=2405">
 <style>
     .hero-search {
         margin-top: 25px;
