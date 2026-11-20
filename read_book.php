@@ -9,7 +9,13 @@ if ($id <= 0) { redirect('books.php'); }
 $book = db_row($conn, "SELECT * FROM books WHERE id=?", 'i', [$id]);
 if (!$book) { redirect('books.php'); }
 
-$readUrl = resolve_read_link($book['read_link']);   // only http(s) / our own uploads
+// Project Gutenberg SQL imports store the Gutenberg ID as books.id, but do not populate read_link.
+// Use that ID as a safe fallback so imported catalog entries get a reading URL.
+$readValue = trim((string)($book['read_link'] ?? ''));
+if ($readValue === '' && (int)$book['id'] > 0) {
+    $readValue = (string)(int)$book['id'];
+}
+$readUrl = resolve_read_link($readValue);   // only http(s) / our own uploads
 // Gutenberg's generated HTML marks the end of its introductory metadata.
 $isGutenbergBook = preg_match('#^https://www\.gutenberg\.org/cache/epub/([0-9]+)/pg\1-images\.html$#i', $readUrl) === 1;
 $readerUrl = $isGutenbergBook ? $readUrl . '#pg-start-separator' : $readUrl;
