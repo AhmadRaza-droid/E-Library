@@ -139,9 +139,24 @@ while($row = mysqli_fetch_assoc($result)){
 $coverPath = safe_url($row['cover_image_url'] ?? '');
 if ($coverPath === '') $coverPath = safe_url($row['cover_file'] ?? '');
 if ($coverPath === '') $coverPath = safe_url($row['image'] ?? ''); // legacy Project Gutenberg imports
+
+// Gutenberg SQL imports often have no usable image URL. Their numeric book ID
+// is also the Gutenberg ebook ID, so build a distinct cover URL for each book.
+$gutenbergCover = $book_id > 0
+    ? 'https://www.gutenberg.org/cache/epub/' . $book_id . '/pg' . $book_id . '.cover.medium.jpg'
+    : '';
+$initialCover = $coverPath !== '' ? $coverPath : $gutenbergCover;
+$coverFallback = ($coverPath !== '' && $gutenbergCover !== '' && $coverPath !== $gutenbergCover)
+    ? $gutenbergCover : '';
 ?>
-<?php if ($coverPath !== ''): ?>
-<img src="<?php echo e($coverPath); ?>" alt="Cover of <?php echo e($row['title'] ?? 'book'); ?>" loading="lazy" onerror="this.hidden=true;this.nextElementSibling.hidden=false;">
+<?php if ($initialCover !== ''): ?>
+<img
+    src="<?php echo e($initialCover); ?>"
+    <?php if ($coverFallback !== ''): ?>data-fallback-src="<?php echo e($coverFallback); ?>"<?php endif; ?>
+    alt="Cover of <?php echo e($row['title'] ?? 'book'); ?>"
+    loading="lazy"
+    onerror="if(this.dataset.fallbackSrc){this.src=this.dataset.fallbackSrc;this.dataset.fallbackSrc='';}else{this.hidden=true;this.nextElementSibling.hidden=false;}"
+>
 <div class="book-cover-fallback" hidden aria-label="No cover available">📚</div>
 <?php else: ?>
 <div class="book-cover-fallback" aria-label="No cover available">📚</div>
