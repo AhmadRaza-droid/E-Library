@@ -30,7 +30,7 @@ $allBooks = [
 
 ["title"=>"The Art of War","author"=>"Sun Tzu","category"=>"war strategy business history","description"=>"A classic book about strategy and leadership.","cover"=>"https://www.gutenberg.org/cache/epub/132/pg132.cover.medium.jpg","read"=>"132","download"=>"132"],
 
-["title"=>"Think and Grow Rich","author"=>"Napoleon Hill","category"=>"business finance money success selfhelp","description"=>"A motivational book about success and personal achievement.","cover"=>"https://www.gutenberg.org/cache/epub/610/pg610.cover.medium.jpg","read"=>"610","download"=>"610"],
+["title"=>"Idylls of the King","author"=>"Alfred, Lord Tennyson","category"=>"poetry epic literature classic","description"=>"A narrative poetry cycle retelling the legends of King Arthur and his knights.","cover"=>"https://www.gutenberg.org/cache/epub/610/pg610.cover.medium.jpg","read"=>"610","download"=>"610"],
 
 ["title"=>"The Prophet","author"=>"Kahlil Gibran","category"=>"poetry philosophy literature","description"=>"A poetic and philosophical book by Kahlil Gibran.","cover"=>"https://www.gutenberg.org/cache/epub/58585/pg58585.cover.medium.jpg","read"=>"58585","download"=>"58585"],
 
