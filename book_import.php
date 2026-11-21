@@ -5,8 +5,14 @@ function import_catalog_book($conn, $book){
     $download = resolve_download_link($book['download']);
     if ($read === '') return 'failed';
     $legacy = ctype_digit((string)$book['read']) ? 'https://www.gutenberg.org/ebooks/' . $book['read'] : $read;
-    if (db_row($conn, 'SELECT id FROM books WHERE (title=? AND author=?) OR read_link IN (?, ?, ?)', 'sssss',
-        [$book['title'], $book['author'], $read, (string)$book['read'], $legacy])) return 'duplicate';
+    $duplicateResult = db_query($conn, 'SELECT id FROM books WHERE (title=? AND author=?) OR read_link IN (?, ?, ?) LIMIT 1', 'sssss',
+        [$book['title'], $book['author'], $read, (string)$book['read'], $legacy]);
+    if ($duplicateResult === false) return 'failed';
+    if ($duplicateResult instanceof mysqli_result) {
+        $duplicate = $duplicateResult->fetch_assoc();
+        $duplicateResult->free();
+        if ($duplicate) return 'duplicate';
+    }
     $ok = db_exec($conn,
         "INSERT INTO books (title, author, category, description, cover_image_url, read_link, download_epub_link, source) VALUES (?, ?, ?, ?, ?, ?, ?, ?)",
         'ssssssss', [$book['title'], $book['author'], $book['category'], $book['description'], safe_url($book['cover']), $read, $download, $book['source'] ?? 'Local Import']);
