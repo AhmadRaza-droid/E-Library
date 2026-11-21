@@ -454,12 +454,28 @@ function resolve_read_link($v){
         $id = $matches[1];
         return "https://www.gutenberg.org/cache/epub/$id/pg$id-images.html";
     }
-    return safe_url($v);
+    $safe = safe_url($v);
+    if ($safe === '') return '';
+    // Search result pages are not book readers; older starter imports used these by mistake.
+    if (is_array($parts) && preg_match('#^/search/?$#i', $parts['path'] ?? '')) return '';
+    return $safe;
 }
 function resolve_download_link($v){
     $v = trim((string)$v);
     if ($v !== '' && ctype_digit($v)) return "https://www.gutenberg.org/ebooks/$v.epub.noimages";
-    return safe_url($v);
+    $safe = safe_url($v);
+    if ($safe === '') return '';
+    $parts = parse_url($safe);
+    // Do not present catalogue/search pages or a general website homepage as a downloadable file.
+    if (is_array($parts)) {
+        $host = strtolower($parts['host'] ?? '');
+        $path = strtolower($parts['path'] ?? '');
+        if (preg_match('#^/search/?$#', $path)
+            || (($host === 'quran.com' || $host === 'www.quran.com') && ($path === '' || $path === '/'))) {
+            return '';
+        }
+    }
+    return $safe;
 }
 
 // ---------- FILE UPLOADS ----------
