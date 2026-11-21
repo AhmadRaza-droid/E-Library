@@ -4,6 +4,7 @@
 - [ ] Home, Books and search pages load without PHP errors.
 - [ ] Search by title, author, category and description.
 - [ ] Register, receive OTP, verify OTP and resend OTP.
+- [ ] Forgot password: request OTP, resend it, verify it and set a new password.
 - [ ] Login, logout, password recovery and password change.
 - [ ] Non-admin users cannot access admin pages or actions.
 
