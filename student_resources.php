@@ -5,7 +5,32 @@ function resources_ready($conn){
     return $result instanceof mysqli_result && $result->num_rows === 1;
 }
 
+function resources_storage_prepare(){
+    $uploadRoot = __DIR__ . '/uploads';
+    $dir = $uploadRoot . '/resources';
+    if (is_link($uploadRoot) || is_link($dir)) return false;
+    if (!is_dir($dir) && !@mkdir($dir, 0750, true) && !is_dir($dir)) return false;
+
+    // Uploaded study materials must never be reachable through a public URL.
+    $htaccess = $dir . '/.htaccess';
+    if (is_link($htaccess)) return false;
+    $rules = "<IfModule mod_authz_core.c>\nRequire all denied\n</IfModule>\n"
+        . "<IfModule !mod_authz_core.c>\nOrder allow,deny\nDeny from all\n</IfModule>\n";
+    if (!is_file($htaccess)) {
+        if (@file_put_contents($htaccess, $rules, LOCK_EX) === false) return false;
+        @chmod($htaccess, 0600);
+    } else {
+        $current = @file_get_contents($htaccess);
+        if (!is_string($current)) return false;
+        if (stripos($current, 'Require all denied') === false && stripos($current, 'Deny from all') === false) {
+            if (@file_put_contents($htaccess, "\n" . $rules, FILE_APPEND | LOCK_EX) === false) return false;
+        }
+    }
+    return is_file($htaccess) && is_readable($htaccess);
+}
+
 function resources_install($conn){
+    if (!resources_storage_prepare()) return false;
     $sql = file_get_contents(__DIR__ . '/student_resources.sql');
     return $sql !== false && $conn->query($sql) === true;
 }
@@ -93,8 +118,9 @@ function resource_validate_file($path, $extension){
 
 function resource_storage_path($key){
     if (!is_string($key) || !preg_match('/\A[a-f0-9]{48}\.bin\z/D', $key)) return null;
-    $dir = __DIR__ . '/uploads/resources';
-    if (is_link($dir) || !is_dir($dir) || is_link($dir . '/' . $key)) return null;
+    $uploadRoot = __DIR__ . '/uploads';
+    $dir = $uploadRoot . '/resources';
+    if (is_link($uploadRoot) || is_link($dir) || !is_dir($dir) || is_link($dir . '/' . $key)) return null;
     return $dir . '/' . $key;
 }
 
