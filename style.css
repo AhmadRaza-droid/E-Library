@@ -930,3 +930,25 @@ body.auth-page > .form-section {
 }
 .chat-header .chat-close:hover { background: #ffffff22; }
 .chat-header .chat-close:focus-visible { outline: 3px solid #ffc72c; }
+
+/* Library-only assistant polish */
+.chat-header { display:flex; align-items:center; justify-content:space-between; text-align:left; gap:12px; }
+.chat-close { background:transparent; color:#fff; border:0; font-size:25px; line-height:1; padding:0 4px; }
+.chat-suggestions { display:flex; flex-wrap:wrap; gap:7px; margin:4px 0 12px; }
+.chat-suggestions button { background:#fff; color:#123c55; border:1px solid #cbd9e2; border-radius:18px; padding:7px 10px; font-size:12px; cursor:pointer; }
+.chat-suggestions button:hover { background:#eaf4f2; }
+.chat-body { scroll-behavior:smooth; }
+.bot-message { border:1px solid #e5ebef; box-shadow:0 2px 8px rgba(0,0,0,.035); }
+.chat-input { background:#fff; }
+.chat-input input { font-size:14px; }
+.chat-input button { font-weight:700; }
+@media(max-width:480px) {
+ .chatbot-box { right:10px; left:10px; bottom:82px; width:auto; height:min(70dvh,560px); }
+ .chatbot-icon { right:14px; bottom:14px; }
+}
+body.dark-mode .chatbot-box { background:#111827; color:#eef4fb; }
+body.dark-mode .chat-body { background:#0b1422; }
+body.dark-mode .bot-message { background:#17263a; color:#eef4fb; border-color:#30445c; }
+body.dark-mode .chat-suggestions button { background:#1d3046; color:#edf4fb; border-color:#40566e; }
+body.dark-mode .chat-input { background:#142236; border-color:#30445c; }
+body.dark-mode .chat-input input { background:#142236; color:#fff; }
