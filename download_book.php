@@ -38,7 +38,7 @@ if(isset($_GET['id'])){
             }
         }
 
-        if ($isLocalPdf && (string)($_GET['file'] ?? '') === '1') {
+        if ($isLocalPdf) {
             $pdfRoot = realpath(__DIR__ . '/uploads/pdfs');
             $pdfPath = realpath(__DIR__ . '/' . $downloadLink);
             if ($pdfRoot === false || $pdfPath === false
