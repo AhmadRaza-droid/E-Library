@@ -19,8 +19,11 @@ if (isset($_POST['request_book'])) {
     }
     rate_limit_add('bookreq:' . (int)$_SESSION['user_id'], 3600);
 
-    db_exec($conn, "INSERT INTO book_requests (user_id, book_name, category, message) VALUES (?, ?, ?, ?)",
+    $saved = db_exec($conn, "INSERT INTO book_requests (user_id, book_name, category, message) VALUES (?, ?, ?, ?)",
             'isss', [(int)$_SESSION['user_id'], $book_name, mb_substr($category, 0, 100), mb_substr($message, 0, 2000)]);
+    if ($saved !== 1) {
+        js_alert_redirect('Your book request could not be saved. Please try again.', 'profile.php');
+    }
     js_alert_redirect('Book request sent successfully', 'profile.php');
 }
 redirect('profile.php');
