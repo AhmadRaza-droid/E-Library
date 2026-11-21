@@ -34,82 +34,7 @@ $allBooks = [
 
 ["title"=>"The Prophet","author"=>"Kahlil Gibran","category"=>"poetry philosophy literature","description"=>"A poetic and philosophical book by Kahlil Gibran.","cover"=>"https://www.gutenberg.org/cache/epub/58585/pg58585.cover.medium.jpg","read"=>"58585","download"=>"58585"],
 
-["title"=>"Python Programming Basics","author"=>"Library Team","category"=>"programming coding computer python technology","description"=>"A beginner friendly programming book for learning Python concepts.","cover"=>"https://upload.wikimedia.org/wikipedia/commons/c/c3/Python-logo-notext.svg","read"=>"https://docs.python.org/3/tutorial/","download"=>"https://docs.python.org/3/tutorial/"],
 
-["title"=>"Web Development Guide","author"=>"Library Team","category"=>"programming web development html css javascript","description"=>"A beginner guide for learning web development basics.","cover"=>"https://upload.wikimedia.org/wikipedia/commons/6/61/HTML5_logo_and_wordmark.svg","read"=>"https://developer.mozilla.org/en-US/docs/Learn","download"=>"https://developer.mozilla.org/en-US/docs/Learn"],
-
-["title"=>"Computer Networking Notes","author"=>"Library Team","category"=>"networking computer technology engineering","description"=>"Basic notes about computer networking concepts.","cover"=>"https://upload.wikimedia.org/wikipedia/commons/d/d2/Internet_map_1024.jpg","read"=>"https://www.geeksforgeeks.org/computer-network-tutorials/","download"=>"https://www.geeksforgeeks.org/computer-network-tutorials/"],
-    [
-"title"=>"Harry Potter and the Philosopher's Stone",
-"author"=>"J. K. Rowling",
-"category"=>"fantasy adventure movie novel",
-"description"=>"First book of the Harry Potter series.",
-"cover"=>"https://covers.openlibrary.org/b/isbn/9780747532699-L.jpg",
-"read"=>"https://openlibrary.org/search?q=Harry+Potter+and+the+Philosopher%27s+Stone",
-"download"=>"https://openlibrary.org/search?q=Harry+Potter+and+the+Philosopher%27s+Stone"
-],
-
-[
-"title"=>"Harry Potter and the Chamber of Secrets",
-"author"=>"J. K. Rowling",
-"category"=>"fantasy adventure movie novel",
-"description"=>"Second book of the Harry Potter series.",
-"cover"=>"https://covers.openlibrary.org/b/isbn/9780747538493-L.jpg",
-"read"=>"https://openlibrary.org/search?q=Harry+Potter+and+the+Chamber+of+Secrets",
-"download"=>"https://openlibrary.org/search?q=Harry+Potter+and+the+Chamber+of+Secrets"
-],
-
-[
-"title"=>"Harry Potter and the Prisoner of Azkaban",
-"author"=>"J. K. Rowling",
-"category"=>"fantasy adventure movie novel",
-"description"=>"Third book of the Harry Potter series.",
-"cover"=>"https://covers.openlibrary.org/b/isbn/9780747542155-L.jpg",
-"read"=>"https://openlibrary.org/search?q=Harry+Potter+and+the+Prisoner+of+Azkaban",
-"download"=>"https://openlibrary.org/search?q=Harry+Potter+and+the+Prisoner+of+Azkaban"
-],
-
-[
-"title"=>"Harry Potter and the Goblet of Fire",
-"author"=>"J. K. Rowling",
-"category"=>"fantasy adventure movie novel",
-"description"=>"Fourth book of the Harry Potter series.",
-"cover"=>"https://covers.openlibrary.org/b/isbn/9780747546245-L.jpg",
-"read"=>"https://openlibrary.org/search?q=Harry+Potter+and+the+Goblet+of+Fire",
-"download"=>"https://openlibrary.org/search?q=Harry+Potter+and+the+Goblet+of+Fire"
-],
-
-[
-"title"=>"Harry Potter and the Order of the Phoenix",
-"author"=>"J. K. Rowling",
-"category"=>"fantasy adventure movie novel",
-"description"=>"Fifth book of the Harry Potter series.",
-"cover"=>"https://covers.openlibrary.org/b/isbn/9780747551003-L.jpg",
-"read"=>"https://openlibrary.org/search?q=Harry+Potter+and+the+Order+of+the+Phoenix",
-"download"=>"https://openlibrary.org/search?q=Harry+Potter+and+the+Order+of+the+Phoenix"
-],
-
-[
-"title"=>"Harry Potter and the Half-Blood Prince",
-"author"=>"J. K. Rowling",
-"category"=>"fantasy adventure movie novel",
-"description"=>"Sixth book of the Harry Potter series.",
-"cover"=>"https://covers.openlibrary.org/b/isbn/9780747581086-L.jpg",
-"read"=>"https://openlibrary.org/search?q=Harry+Potter+and+the+Half-Blood+Prince",
-"download"=>"https://openlibrary.org/search?q=Harry+Potter+and+the+Half-Blood+Prince"
-],
-
-[
-"title"=>"Harry Potter and the Deathly Hallows",
-"author"=>"J. K. Rowling",
-"category"=>"fantasy adventure movie novel",
-"description"=>"Seventh book of the Harry Potter series.",
-"cover"=>"https://covers.openlibrary.org/b/isbn/9780747591054-L.jpg",
-"read"=>"https://openlibrary.org/search?q=Harry+Potter+and+the+Deathly+Hallows",
-"download"=>"https://openlibrary.org/search?q=Harry+Potter+and+the+Deathly+Hallows"
-],
-
-["title"=>"Islamic Studies Introduction","author"=>"Library Team","category"=>"islamic religion quran hadith urdu","description"=>"An introductory book for Islamic studies and basic concepts.","cover"=>"https://images.unsplash.com/photo-1542816417-0983670d7f62?q=80&w=800&auto=format&fit=crop","read"=>"https://quran.com/","download"=>"https://quran.com/"]
 
 ];
 
@@ -175,8 +100,8 @@ if (isset($_POST['scrape'])) {
 
 <section class="page-header">
     <h1>Auto Import Books</h1>
-    <p>Starter list is a small offline collection. Online search finds more public-domain books by title or author.</p>
-    <p>Starter categories: programming, science, adventure, movie, history, islamic, urdu, business, horror, detective, novel, philosophy.</p>
+    <p>Starter list contains Project Gutenberg classics with online reading and EPUB links. Online search finds more public-domain titles.</p>
+    <p>Starter categories: science fiction, adventure, history, horror, detective, classic literature, philosophy, poetry.</p>
 </section>
 
 <section class="form-section">
