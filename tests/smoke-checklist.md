@@ -20,6 +20,7 @@
 - [ ] Reject invalid file types, oversized files and malformed uploads.
 - [ ] Delete an uploaded book; confirm its own PDF is removed and shared covers remain in use.
 - [ ] Read remote and uploaded book files on desktop and mobile.
+- [ ] If an external reader cannot load inside the embedded frame, use the Open in new tab fallback.
 
 ## User features and administration
 - [ ] Favorites, reviews, bookmarks, progress and history work.
