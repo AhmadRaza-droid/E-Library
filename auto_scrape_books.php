@@ -3,6 +3,7 @@ include 'session_timeout.php';
 include 'config.php';
 
 require_admin($conn);
+require_once __DIR__ . '/audit.php';
 
 $allBooks = [
 
@@ -74,6 +75,7 @@ if (isset($_POST['scrape'])) {
     $message = $counts['imported'] > 0 ? $counts['imported'] . ' books imported successfully.' : 'No new matching books found.';
     $message .= ' ' . $counts['duplicate'] . ' duplicates skipped. ' . $counts['failed'] . ' failed.';
     if ($counts['imported'] === 0 && $counts['duplicate'] > 0) $message .= ' Matching books are already in your library. Try Online search for new books.';
+    audit_log($conn, 'Auto import books', 'Search: ' . mb_substr($keyword, 0, 100) . ' | Source: ' . $source . ' | Imported: ' . $counts['imported'] . ', duplicates: ' . $counts['duplicate'] . ', failed: ' . $counts['failed']);
     js_alert_redirect($message, 'auto_scrape_books.php');
 }
 
