@@ -518,7 +518,12 @@ $settings = get_settings($conn);
                 <div class="profile-book-card">
                     <h3><?php echo htmlspecialchars($bm['title']); ?></h3>
                     <p><?php echo htmlspecialchars($bm['note']); ?></p>
-                    <a href="read_book.php?id=<?php echo $bm['book_id']; ?>"><button class="btn-primary">Open Book</button></a>
+                    <a href="read_book.php?id=<?php echo (int)$bm['book_id']; ?>"><button class="btn-primary" type="button">Open Book</button></a>
+                    <form method="POST" action="remove_bookmark.php" style="display:inline;" onsubmit="return confirm('Remove this bookmark?');">
+                        <?php echo csrf_field(); ?>
+                        <input type="hidden" name="bookmark_id" value="<?php echo (int)$bm['id']; ?>">
+                        <button type="submit" class="btn-remove">Remove Bookmark</button>
+                    </form>
                 </div>
             <?php } ?>
         <?php } else { ?>
