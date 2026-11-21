@@ -18,7 +18,7 @@ function resources_storage_prepare(){
         . "<IfModule !mod_authz_core.c>\nOrder allow,deny\nDeny from all\n</IfModule>\n";
     if (!is_file($htaccess)) {
         if (@file_put_contents($htaccess, $rules, LOCK_EX) === false) return false;
-        @chmod($htaccess, 0600);
+        @chmod($htaccess, 0644);
     } else {
         $current = @file_get_contents($htaccess);
         if (!is_string($current)) return false;
