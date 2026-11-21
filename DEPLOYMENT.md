@@ -9,7 +9,7 @@ Environment variables are also supported by the app's configuration layer: DB_HO
 Run `composer install --no-dev --optimize-autoloader` locally, then upload the generated `vendor/` folder to the site root with composer.json and composer.lock. Without this dependency and valid SMTP credentials, email/OTP sending cannot work.
 
 ## Database
-Export a full database backup in phpMyAdmin first. Then select the E-Library database and import `database/migrations/2026-11-20-add-book-description-and-download-count.sql`. This migration adds only the two columns identified by the application error log.
+Export a full database backup in phpMyAdmin first. Then select the E-Library database and run the migrations in `database/migrations/` in date order. The 2026-11-20 migration adds `description` and `download_count`; the 2026-11-21 migration adds missing cover, reader, EPUB, uploaded-file and source columns used by the current app. Both migrations check for existing columns before adding them and preserve existing book records. If you already ran the 2026-11-20 migration, run only the 2026-11-21 migration now.
 
 ## Book import and uploads
 Online Project Gutenberg search requires PHP cURL to be enabled. The offline starter list contains direct Gutenberg book IDs; non-book search pages are rejected as reading/download links. Uploaded PDFs are stored under `uploads/pdfs/`, cover images under `uploads/covers/`, and moderated student materials under `uploads/resources/`. Make sure the hosting account allows PHP to create/write these folders. Enabling student materials creates a private `.htaccess` deny rule in its storage folder. Local PDF downloads are streamed as attachments after the file path is checked.
