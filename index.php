@@ -272,7 +272,12 @@ $chatRows = db_all($conn, "SELECT id, title, author, SUBSTRING(description, 1, 3
 <div class="chatbot-box" id="chatbot">
     <div class="chat-header"><span>🤖 Library Assistant</span><button type="button" class="chat-close" onclick="toggleChat()" aria-label="Close library assistant">×</button></div>
     <div class="chat-body" id="chat-body" role="log" aria-live="polite" aria-relevant="additions">
-        <div class="bot-message">Hello 👋 Ask me about a book, author, category, or how to use the library. Aap Roman Urdu mein bhi pooch sakte hain.</div>
+        <div class="bot-message">Hello 👋 Main Book’s Library Assistant hoon. Books, account, reading aur downloads ke bare mein poochhein. Aap Roman Urdu mein bhi sawal kar sakte hain.</div>
+        <div class="chat-suggestions" aria-label="Suggested questions">
+            <button type="button" onclick="askLibraryQuestion('How do I reset my password?')">Reset password</button>
+            <button type="button" onclick="askLibraryQuestion('PDF download nahi ho rahi')">Download help</button>
+            <button type="button" onclick="askLibraryQuestion('Show me science books')">Find books</button>
+        </div>
     </div>
     <form class="chat-input" onsubmit="sendMessage(event)">
         <input type="text" id="userInput" aria-label="Ask the library assistant" placeholder="Ask about books..." maxlength="500" autocomplete="off">
@@ -335,28 +340,41 @@ function sendMessage(event){
     }
 }
 
+function askLibraryQuestion(question){
+    const input = document.getElementById('userInput');
+    input.value = question;
+    sendMessage();
+}
+
 function getBotReply(message){
     const raw = String(message || '').trim();
     const text = raw.toLocaleLowerCase().replace(/[’‘]/g, "'").replace(/\s+/g, ' ');
     if (!text) return {text: 'Please type a question. Aap kitab ka naam, author ya apna sawal likhein.'};
 
     const has = pattern => pattern.test(text);
+    // Focused support knowledge for this library website only.
     const faqs = [
-        {test: /\b(hi|hello|hey|salam|assalam ?o ?alaikum|assalamu ?alaikum)\b/, answer: '👋 Wa Alaikum Assalam! Main Library Assistant hoon. Aap books, authors, categories, reading, downloads, account aur library features ke bare mein pooch sakte hain.'},
-        {test: /\b(download|download kar|epub|pdf)\b/, answer: '⬇ Books page par book ke saamne Download option dekhein. Uploaded PDF direct download hoti hai; Gutenberg books ke liye EPUB link/ID use hota hai. Agar Download unavailable ho to us book ka file/link library mein mojood nahi.'},
-        {test: /\b(read|reading|parhna|parhun|parhney|online book)\b/, answer: '📖 Books page par book select karein aur Read button dabayein. Agar Read option kaam na kare to mumkin hai us book ka reading link available na ho.'},
-        {test: /\b(login|log in|sign in|password|forgot password)\b/, answer: '🔐 Login page par apna registered email aur password enter karein. Password yaad na ho to Forgot Password use karein.'},
-        {test: /\b(register|registration|sign ?up|account banao|account banana)\b/, answer: '📝 Register page kholein, apni details fill karein aur email verification/OTP complete karein. Phir login kar sakte hain.'},
-        {test: /\b(profile|my account|account details|meri profile|mera account)\b/, answer: '👤 Login karne ke baad navigation se Profile open karein. Wahan aap apni details, saved books, bookmarks, recent reading aur progress dekh sakte hain.'},
-        {test: /\b(progress|reading progress|continue reading|kahan se parh|last page|reading history|recently viewed)\b/, answer: '📖 Login ke baad book parhna shuru karein. Reader page par progress save karein; Profile mein reading progress aur recently viewed books milengi.'},
-        {test: /\b(favou?rite|favourite|pasandida|bookmark|save book)\b/, answer: '❤️ Account mein login karein. Book ke Favorites/Bookmark option se save karein; saved books Profile ya Library section mein mil sakti hain.'},
-        {test: /\b(review|rating|rate|stars)\b/, answer: '⭐ Book details/page par rating select karein aur apna review submit karein. Review dene ke liye login zaroori ho sakta hai.'},
-        {test: /\b(admin|administrator|admin panel)\b/, answer: '🛡 Admin Panel sirf verified admin account ke liye hai. Admin books, users, categories, messages, notifications aur student materials manage kar sakta hai.'},
-        {test: /\b(dark mode|light mode|theme|night mode)\b/, answer: '🌙 Navigation bar mein Dark button use karke dark aur light theme switch karein. Theme browser mein save hoti hai.'},
-        {test: /\b(contact|rabta|message|support|help)\b/, answer: '✉️ Library team se rabta karne ke liye Contact page open karein aur apna message submit karein.'},
-        {test: /\b(category|categories|subject|subjects|kis qisam)\b/, answer: '📚 Books ko subject/category ke hisaab se browse karne ke liye Books page ya home page ka Browse by subject section use karein.'},
-        {test: /\b(request|mangwa|mangwana|book chahiye|suggest a book)\b/, answer: '📩 Agar required book library mein nahi milti to Book Request option/page check karein aur book ka naam submit karein.'},
-        {test: /\b(otp|verification|verify email|email verify)\b/, answer: '📨 Registration ke baad apni email inbox aur spam folder check karein. OTP na aaye to kuch dair baad resend option try karein.'}
+        {test:/\b(hi|hello|hey|salam|assalam ?o ?alaikum|assalamu ?alaikum|aoa)\b/,answer:'👋 Wa Alaikum Assalam! Main Book’s Library Assistant hoon. Books, accounts, reading, downloads, bookmarks, reviews aur website features ke bare mein pooch sakte hain.'},
+        {test:/\b(about (the )?(website|library)|website kya|library kya|what is this website)\b/,answer:'📚 Book’s Library ek digital library hai. Yahan books search aur categories se browse, online read, available files download, favorites/bookmarks save aur book requests submit kar sakte hain.'},
+        {test:/\b(search|find|look for|talash|dhoond|dhund|book name)\b/,answer:'🔎 Book ka title, author ya subject likhein. Main library catalogue mein matching books dhoond kar Read links dikha sakta hoon. Books page ka search/filter bhi use karein.'},
+        {test:/\b(download|epub|pdf|download nahi)\b/,answer:'⬇ Books page par selected book ka Download button use karein. Uploaded PDF direct download hoti hai; catalogue books EPUB link de sakti hain. Button unavailable ho ya download fail ho to us book ki file/link filhaal available nahi ho sakti. Contact page par title ke sath report karein.'},
+        {test:/\b(read|reading|parhna|parhun|parhney|online book|reader|open book)\b/,answer:'📖 Books page par book dhoond kar Read Book dabayein. Reader mein reading progress save karne ka option ho sakta hai. Reader na khule to book ka title Contact page par report karein.'},
+        {test:/\b(login|log in|sign in|password|forgot password)\b/,answer:'🔐 Login page par registered email aur password enter karein. Password bhool gaye hain to Forgot Password use karein, email inbox aur Spam/Junk folder check karein.'},
+        {test:/\b(register|registration|sign ?up|account banao|new account)\b/,answer:'📝 Register page par name, email aur password fill karein. Registration ke baad email OTP verify karein; phir Login page se sign in karein.'},
+        {test:/\b(otp|verification|verify email|email verify|code nahi)\b/,answer:'📨 Registration ya password reset ka OTP email inbox aur Spam/Junk folder mein check karein. OTP na aaye ya expire ho to Resend OTP option use karein.'},
+        {test:/\b(profile|my account|account details|meri profile|mera account)\b/,answer:'👤 Login ke baad Profile page open karein. Wahan account details aur available reading activity, favorites/bookmarks aur progress manage kar sakte hain.'},
+        {test:/\b(progress|continue reading|kahan se parh|last page|reading history|recently viewed|history)\b/,answer:'📚 Login ke baad reader mein reading progress save karein. Profile page par available progress/recently viewed activity se continue kar sakte hain.'},
+        {test:/\b(favou?rite|favourite|pasandida|bookmark|save book|saved book)\b/,answer:'❤️ Login karein, phir book ke Favorite ya Bookmark option se save karein. Apni saved books Profile page par check karein.'},
+        {test:/\b(review|rating|rate|stars|feedback)\b/,answer:'⭐ Book listing par rating select karein aur review likh kar Submit Review dabayein. Review dene ke liye login zaroori hai.'},
+        {test:/\b(request|mangwa|mangwana|book chahiye|suggest a book|new book)\b/,answer:'📩 Jo book library mein nahi mil rahi, us ke liye Book Request option/page par title aur category submit karein. Admin request review karega; addition guaranteed nahi hoti.'},
+        {test:/\b(category|categories|subject|subjects|kis qisam|genre)\b/,answer:'🗂 Books page par category filter use karein, ya home page ke Browse by Subject section se available categories explore karein.'},
+        {test:/\b(contact|rabta|message|support|help|complain|report problem)\b/,answer:'✉️ Website team se rabta karne ke liye Contact page open karein aur apna naam, email aur issue detail submit karein. Book issue report karte waqt title bhi likhein.'},
+        {test:/\b(admin|administrator|admin panel)\b/,answer:'🛡 Admin Panel sirf authorized admin account ke liye hai. Admin books, users, categories, requests, reviews, messages, notifications aur student materials manage kar sakta hai.'},
+        {test:/\b(student material|notes|lecture|assignment|upload material|resource)\b/,answer:'📑 Student Materials section mein available resources browse karein. Upload option enabled ho to material submit karein; admin approval ke baad publish ho sakta hai.'},
+        {test:/\b(dark mode|light mode|theme|night mode)\b/,answer:'🌙 Navigation bar ka Dark/Light control use karke website theme change karein. Preference browser mein save hoti hai.'},
+        {test:/\b(mobile|phone|android|responsive)\b/,answer:'📱 Website mobile browser par bhi use ki ja sakti hai. Menu button se navigation open karein. Updated Chrome browser use karna behtar hai.'},
+        {test:/\b(privacy|data|account delete|delete account|security)\b/,answer:'🔒 Apna password kisi ke sath share na karein. Account ya personal-data request ke liye Contact page se library team ko message karein.'},
+        {test:/\b(thank|thanks|shukriya|jazak)\b/,answer:'😊 Khushi hui ke main madad kar saka! Library ke kisi feature ya book ke bare mein aur sawal pooch lein.'}
     ];
     for (const item of faqs) if (item.test.test(text)) return {text: item.answer};
 
@@ -400,9 +418,9 @@ function getBotReply(message){
     }).filter(item => item.score > 0).sort((a, b) => b.score - a.score || String(a.book.title).localeCompare(String(b.book.title)));
 
     if (!scored.length) {
-        return {text: selectedCategory
-            ? 'Is category ki matching book abhi nahi mili. Aap Books page par tamam books browse kar sakte hain ya kisi specific title/author ka naam try karein.'
-            : 'Mujhe is sawal ka exact jawab library data mein nahi mila. Aap book ka title, author ya category likh kar search karein. Website help ke liye login, register, download, read, bookmark ya contact pooch sakte hain.'};
+        const websiteTerms = /\b(book|library|website|account|login|register|password|download|read|reader|pdf|epub|profile|bookmark|favorite|review|rating|request|category|admin|student|material|otp|email|contact|progress|history|kitab|parhna|masla|problem)\b/;
+        if (websiteTerms.test(text)) return {text:'🤝 Main Book’s Library website ke features aur catalogue ke bare mein guide karta hoon. Apna sawal thora detail se likhein, misal: “password reset kaise karun?” ya “PDF download nahi ho rahi”. Book ka exact title/author bhi likh sakte hain.'};
+        return {text:'Main Book’s Library ka website assistant hoon, general-purpose ChatGPT nahi. Main sirf is library ke books, authors, categories, accounts, reading, downloads, bookmarks, reviews, requests aur website support ke sawalat mein madad karta hoon.'};
     }
     const results = scored.slice(0, 5).map(item => item.book);
     const exact = scored[0].score >= 20;
