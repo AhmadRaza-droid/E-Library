@@ -86,3 +86,7 @@ if ($maintenanceMode && empty($_SESSION['admin_id']) && !in_array($scriptName, $
 if (($_SERVER['REQUEST_METHOD'] ?? 'GET') === 'POST' && !defined('SKIP_CSRF')) {
     csrf_require();
 }
+
+// ========== WEBSITE ACTIVITY TRACKING ==========
+require_once __DIR__ . '/activity.php';
+track_website_request($conn);
