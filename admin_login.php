@@ -1,6 +1,7 @@
 <?php
 require_once __DIR__ . '/session_init.php';
 include 'config.php';
+require_once __DIR__ . '/audit.php';
 
 if (isset($_POST['login'])) {
     $username = trim($_POST['username'] ?? '');   // admin full name OR e-mail
@@ -34,10 +35,12 @@ if (isset($_POST['login'])) {
             $_SESSION['auth_password_hash'] = hash('sha256', $admin['password']);
             $_SESSION['CREATED']       = time();
             $_SESSION['LAST_ACTIVITY'] = time();
+            audit_log($conn, 'Admin login', 'Successful admin sign-in.');
             js_alert_redirect('Admin Login Successful', 'admin_dashboard.php');
         }
     }
 
+    audit_log($conn, 'Admin login failed', 'Failed sign-in attempt for username/email: ' . mb_substr($username, 0, 150), 0, 'Unknown / attempted: ' . mb_substr($username, 0, 120));
     js_alert_redirect('Invalid username or password', 'admin_login.php');   // same message for both cases
 }
 ?>
