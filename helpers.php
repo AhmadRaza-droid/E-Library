@@ -123,6 +123,16 @@ function admin_delete_record($conn, $kind, $id){
         return false;
     }
     foreach ($children as $table) {
+        // Optional activity tables may be absent in older database imports.
+        if (in_array($table, ['downloads', 'reading_history'], true)) {
+            $exists = db_query($conn, "SHOW TABLES LIKE ?", 's', [$table]);
+            if ($exists === false) { $conn->rollback(); return false; }
+            if ($exists instanceof mysqli_result) {
+                $found = $exists->fetch_row();
+                $exists->free();
+                if (!$found) continue;
+            }
+        }
         if (db_exec($conn, "DELETE FROM `$table` WHERE `$column`=?", 'i', [(int)$id]) === false) {
             $conn->rollback();
             return false;
@@ -139,8 +149,11 @@ function admin_delete_record($conn, $kind, $id){
         foreach (['pdf_file' => 'pdfs', 'cover_file' => 'covers'] as $field => $folder) {
             $relative = (string)($record[$field] ?? '');
             if (!preg_match('#^uploads/' . $folder . '/[A-Za-z0-9._-]+$#', $relative)) continue;
-            $references = db_row($conn, "SELECT id FROM books WHERE pdf_file=? OR cover_file=? LIMIT 1", 'ss', [$relative, $relative]);
-            if ($references !== null) continue; // keep shared files or files when reference lookup fails
+            $referenceResult = db_query($conn, "SELECT id FROM books WHERE pdf_file=? OR cover_file=? LIMIT 1", 'ss', [$relative, $relative]);
+            if ($referenceResult === false) continue; // never delete a file if its reference check failed
+            $references = $referenceResult instanceof mysqli_result ? $referenceResult->fetch_assoc() : null;
+            if ($referenceResult instanceof mysqli_result) $referenceResult->free();
+            if ($references) continue; // another book still uses this file
             $base = realpath(__DIR__ . '/uploads/' . $folder);
             $file = realpath(__DIR__ . '/' . $relative);
             if ($base !== false && $file !== false && str_starts_with($file, $base . DIRECTORY_SEPARATOR) && is_file($file)) {
