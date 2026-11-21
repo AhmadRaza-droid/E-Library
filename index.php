@@ -343,10 +343,12 @@ function getBotReply(message){
     const has = pattern => pattern.test(text);
     const faqs = [
         {test: /\b(hi|hello|hey|salam|assalam ?o ?alaikum|assalamu ?alaikum)\b/, answer: '👋 Wa Alaikum Assalam! Main Library Assistant hoon. Aap books, authors, categories, reading, downloads, account aur library features ke bare mein pooch sakte hain.'},
-        {test: /\b(download|download kar|epub|pdf)\b/, answer: '⬇ Book download karne ke liye Books page kholein, book select karein aur Download option check karein. Download sirf un books ke liye available hota hai jinka valid file/link library mein mojood ho.'},
+        {test: /\b(download|download kar|epub|pdf)\b/, answer: '⬇ Books page par book ke saamne Download option dekhein. Uploaded PDF direct download hoti hai; Gutenberg books ke liye EPUB link/ID use hota hai. Agar Download unavailable ho to us book ka file/link library mein mojood nahi.'},
         {test: /\b(read|reading|parhna|parhun|parhney|online book)\b/, answer: '📖 Books page par book select karein aur Read button dabayein. Agar Read option kaam na kare to mumkin hai us book ka reading link available na ho.'},
         {test: /\b(login|log in|sign in|password|forgot password)\b/, answer: '🔐 Login page par apna registered email aur password enter karein. Password yaad na ho to Forgot Password use karein.'},
         {test: /\b(register|registration|sign ?up|account banao|account banana)\b/, answer: '📝 Register page kholein, apni details fill karein aur email verification/OTP complete karein. Phir login kar sakte hain.'},
+        {test: /\b(profile|my account|account details|meri profile|mera account)\b/, answer: '👤 Login karne ke baad navigation se Profile open karein. Wahan aap apni details, saved books, bookmarks, recent reading aur progress dekh sakte hain.'},
+        {test: /\b(progress|reading progress|continue reading|kahan se parh|last page|reading history|recently viewed)\b/, answer: '📖 Login ke baad book parhna shuru karein. Reader page par progress save karein; Profile mein reading progress aur recently viewed books milengi.'},
         {test: /\b(favou?rite|favourite|pasandida|bookmark|save book)\b/, answer: '❤️ Account mein login karein. Book ke Favorites/Bookmark option se save karein; saved books Profile ya Library section mein mil sakti hain.'},
         {test: /\b(review|rating|rate|stars)\b/, answer: '⭐ Book details/page par rating select karein aur apna review submit karein. Review dene ke liye login zaroori ho sakta hai.'},
         {test: /\b(admin|administrator|admin panel)\b/, answer: '🛡 Admin Panel sirf verified admin account ke liye hai. Admin books, users, categories, messages, notifications aur student materials manage kar sakta hai.'},
