@@ -18,8 +18,13 @@ if (isset($_POST['verify'])) {
 
     if ($result === 'ok') {
         if ($type === 'registration') {
-            db_exec($conn, "UPDATE users SET is_verified=1, otp=NULL, otp_expiry=NULL WHERE email=?", 's', [$email]);
+            $updated = db_exec($conn, "UPDATE users SET is_verified=1, otp=NULL, otp_expiry=NULL WHERE email=? AND is_verified=0", 's', [$email]);
+            if ($updated !== 1) {
+                error_log('Email verification update failed for a pending account.');
+                js_alert_redirect('❌ Verification could not be completed. Please try again.', 'verify_otp.php');
+            }
             unset($_SESSION['temp_email']);
+            unset($_SESSION['last_resend']);
             js_alert_redirect('✅ Email verified successfully! Please login.', 'login.php');
         }
         // password reset: remember WHICH email was verified; reset_email must stay in the session
