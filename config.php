@@ -63,6 +63,24 @@ $site_url = 'https://' . preg_replace('/[^a-zA-Z0-9.\-:]/', '', $_SERVER['HTTP_H
 require_once __DIR__ . '/helpers.php';
 require_current_session($conn);
 
+// ========== ADMIN-CONTROLLED MAINTENANCE MODE ==========
+$maintenanceMode = (string)get_setting($conn, 'maintenance_mode', '0') === '1';
+$scriptName = basename((string)($_SERVER['SCRIPT_NAME'] ?? ''));
+$maintenanceExempt = [
+    'admin_login.php', 'admin_logout.php', 'admin_forgot_password.php',
+    'admin_dashboard.php', 'admin_settings.php', 'admin_audit_logs.php',
+    'admin_change_password.php', 'admin_backup.php', 'admin_analytics.php',
+    'admin_resources.php', 'auto_scrape_books.php', 'upload_book.php',
+    'update_request_status.php', 'delete_review.php'
+];
+if ($maintenanceMode && empty($_SESSION['admin_id']) && !in_array($scriptName, $maintenanceExempt, true)) {
+    http_response_code(503);
+    header('Retry-After: 3600');
+    $maintenanceTitle = e(site_name($conn));
+    echo '<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Under Maintenance</title><style>body{margin:0;min-height:100vh;display:grid;place-items:center;background:#edf4f1;font-family:Segoe UI,Arial,sans-serif;color:#173b56}.box{max-width:560px;margin:20px;padding:42px 30px;background:white;border-radius:18px;text-align:center;box-shadow:0 12px 40px #173b5618}.icon{font-size:54px}.box h1{margin:14px 0}.box p{line-height:1.7;color:#607286}</style></head><body><main class="box"><div class="icon">🛠️</div><h1>' . $maintenanceTitle . ' is under maintenance</h1><p>We are making improvements to the library. Please check back soon.</p></main></body></html>';
+    exit();
+}
+
 // ========== GLOBAL CSRF PROTECTION FOR EVERY POST ==========
 // (endpoints that must be public can define('SKIP_CSRF', true) before including config.php)
 if (($_SERVER['REQUEST_METHOD'] ?? 'GET') === 'POST' && !defined('SKIP_CSRF')) {
