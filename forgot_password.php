@@ -57,8 +57,9 @@ if (isset($_POST['reset_password'])) {
 
     $ok = db_exec($conn, "UPDATE users SET password=?, otp=NULL, otp_expiry=NULL WHERE email=?",
                   'ss', [hash_password_value($new_password), $email]);
-    if ($ok === false) {
-        js_alert_redirect('❌ Failed to reset password. Try again.', 'forgot_password.php?step=reset');
+    if ($ok !== 1) {
+        error_log('Password reset did not update exactly one account.');
+        js_alert_redirect('❌ Failed to reset password. Please request a new OTP and try again.', 'forgot_password.php');
     }
 
     unset($_SESSION['reset_email'], $_SESSION['otp_verified_email'], $_SESSION['otp_verified_at']);
