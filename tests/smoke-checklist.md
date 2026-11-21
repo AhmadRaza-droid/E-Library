@@ -1,7 +1,8 @@
 # E-Library staging smoke tests
 
 ## Core pages and accounts
-- [ ] Home, Books and search pages load without PHP errors.
+- [ ] After running the applicable idempotent migrations, Home, Books and search pages load without PHP errors.
+- [ ] Legacy Project Gutenberg imports keep their cover images and can use the ID-based reader/download fallback.
 - [ ] Search by title, author, category and description.
 - [ ] Register, receive OTP, verify OTP and resend OTP.
 - [ ] Forgot password: request OTP, resend it, verify it and set a new password.
