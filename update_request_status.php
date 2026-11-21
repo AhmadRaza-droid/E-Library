@@ -4,6 +4,7 @@ include 'config.php';
 
 require_post();
 require_admin($conn);
+require_once __DIR__ . '/audit.php';
 
 if (!isset($_POST['update_status'])) redirect('admin_dashboard.php?page=book_requests');
 
@@ -17,4 +18,5 @@ $saved = db_exec($conn, "UPDATE book_requests SET status=? WHERE id=?", 'si', [$
 if ($saved !== 1) {
     js_alert_redirect('Book request status was not changed. Refresh and try again.', 'admin_dashboard.php?page=book_requests');
 }
+audit_log($conn, 'Update book request status', 'Request ID ' . $request_id . ' set to ' . $status . '.');
 js_alert_redirect('Book request status updated.', 'admin_dashboard.php?page=book_requests');
