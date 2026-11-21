@@ -59,6 +59,7 @@ if (isset($_POST['login'])) {
         $_SESSION['auth_password_hash'] = hash('sha256', $user['password']);
         $_SESSION['CREATED']  = time();
         $_SESSION['LAST_ACTIVITY'] = time();
+        website_activity_log($conn, 'User login', 'Successful sign-in.', (int)$user['id'], (string)$user['fullname']);
 
         js_alert_redirect('✅ Login Successful', 'index.php');
     }
