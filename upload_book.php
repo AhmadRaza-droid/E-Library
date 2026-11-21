@@ -3,6 +3,7 @@ require_once __DIR__ . '/session_init.php';
 include 'config.php';
 
 require_admin($conn);
+require_once __DIR__ . '/audit.php';
 
 $maxPdfBytes = filter_var(cfg('pdf_max_bytes', 20 * 1024 * 1024), FILTER_VALIDATE_INT, [
     'options' => ['min_range' => 1024 * 1024, 'max_range' => 20 * 1024 * 1024],
@@ -100,6 +101,7 @@ if (isset($_POST['upload'])) {
             if ($coverPath !== '') @unlink(__DIR__ . '/' . $coverPath);
         } elseif ($inserted > 0) {
             $success = $inserted . ' book(s) uploaded successfully.';
+            audit_log($conn, 'Upload PDF books', 'Uploaded ' . $inserted . ' PDF book(s). Shared author: ' . mb_substr($author, 0, 120) . '.');
             js_alert_redirect($success, 'admin_dashboard.php?page=all_books');
         } else {
             if ($transactionStarted) $conn->rollback();
