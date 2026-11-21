@@ -22,6 +22,9 @@ if (isset($_POST['resend'])) {
         rate_limit_add('resend:' . strtolower($email), 600);
         $_SESSION['last_resend'] = time();
         $otp = otp_issue($conn, $email);
+        if ($otp === false) {
+            js_alert_redirect('❌ Could not create a new OTP. Please try again later.', 'verify_otp.php');
+        }
         if (send_mail($email, $user['fullname'], 'New OTP Code - Book Library', otp_mail_html('Your New OTP', $user['fullname'], $otp))) {
             js_alert_redirect('✅ New OTP sent to your email!', 'verify_otp.php');
         }
