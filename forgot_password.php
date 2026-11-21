@@ -21,7 +21,9 @@ if (isset($_POST['send_otp'])) {
     $user = db_row($conn, "SELECT fullname FROM users WHERE email=? LIMIT 1", 's', [$email]);
     if ($user) {
         $otp = otp_issue($conn, $email);
-        send_mail($email, $user['fullname'], 'Password Reset OTP', otp_mail_html('Password Reset OTP', '', $otp));
+        if ($otp !== false) {
+            send_mail($email, $user['fullname'], 'Password Reset OTP', otp_mail_html('Password Reset OTP', '', $otp));
+        }
     }
     // same answer whether the account exists or not (no account enumeration)
     unset($_SESSION['otp_verified_email'], $_SESSION['otp_verified_at'], $_SESSION['temp_email']);
