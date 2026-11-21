@@ -141,7 +141,11 @@ function resource_save_upload($file){
         return [false, 'Office uploads require the PHP ZIP extension. Please ask the administrator or upload a PDF.'];
     }
     if (!resource_validate_file($tmp, $ext)) return [false, 'The file content does not match its format, is encrypted, or is not supported. Export a fresh PDF or Office file.'];
-    // Deployment includes a deny-all .htaccess. Refuse uploads if protection is missing.
+    // Prepare and verify private storage even on older installs where the table already exists.
+    if (!resources_storage_prepare()) {
+        return [false, 'Upload storage is unavailable. Ask the administrator to check folder permissions.'];
+    }
+    // Refuse uploads unless the private storage protection is present.
     $key = bin2hex(random_bytes(24)) . '.bin';
     $path = resource_storage_path($key);
     if (!$path || !is_file(dirname($path) . '/.htaccess') || !is_writable(dirname($path))) {
