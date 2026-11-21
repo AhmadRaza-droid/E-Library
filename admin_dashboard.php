@@ -4,12 +4,33 @@ include 'config.php';
 require_once __DIR__ . '/mailer.php';
 
 require_admin($conn);
+require_once __DIR__ . '/audit.php';
 require_once __DIR__ . '/student_resources.php';
 $pendingMaterials = resources_pending($conn);
 $me = (int)$_SESSION['admin_id'];
 
 $notice = null;   // ['message', 'redirect']
-function done($msg, $page){ js_alert_redirect($msg, 'admin_dashboard.php?page=' . $page); }
+function done($msg, $page){
+    global $conn;
+    $actions = [
+        'delete_book'=>'Delete book','delete_user'=>'Delete user','add_book'=>'Add book',
+        'add_category'=>'Add category','delete_category'=>'Delete category',
+        'make_admin'=>'Grant admin role','remove_admin'=>'Remove admin role',
+        'delete_message'=>'Delete message','reply_submit'=>'Reply to message',
+        'send_notification'=>'Send notification'
+    ];
+    foreach ($actions as $key => $label) {
+        if (!isset($_POST[$key])) continue;
+        $target = is_scalar($_POST[$key]) ? (string)$_POST[$key] : '';
+        if ($key === 'add_book') $target = trim((string)($_POST['title'] ?? ''));
+        if ($key === 'add_category') $target = trim((string)($_POST['category'] ?? ''));
+        if ($key === 'send_notification') $target = trim((string)($_POST['title'] ?? ''));
+        $detail = $target !== '' ? 'Target: ' . $target . ' | Result: ' . trim(strip_tags((string)$msg)) : 'Result: ' . trim(strip_tags((string)$msg));
+        audit_log($conn, $label, $detail);
+        break;
+    }
+    js_alert_redirect($msg, 'admin_dashboard.php?page=' . $page);
+}
 
 // ========== ALL STATE-CHANGING ACTIONS ARE POST + CSRF (checked globally in config.php) ==========
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
@@ -304,6 +325,7 @@ $book_requests = mysqli_query($conn,
     <a href="?page=book_requests" class="<?php echo $page == 'book_requests' ? 'active' : ''; ?>">📝 Book Requests</a>
     <a href="?page=reviews" class="<?php echo $page == 'reviews' ? 'active' : ''; ?>">⭐ Reviews</a>
     <a href="admin_analytics.php">📊 Analytics</a>
+    <a href="admin_audit_logs.php">🧾 Audit Log</a>
     <a href="admin_settings.php">⚙️ Settings</a>
     <a href="admin_backup.php">💾 Backup</a>
     <a href="performance.php">🚀 Performance</a>
