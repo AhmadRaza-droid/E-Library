@@ -25,6 +25,9 @@ if (isset($_POST['login'])) {
         if (empty($user['is_verified'])) {
             // send a fresh OTP and continue on the verify page
             $otp = otp_issue($conn, $user['email']);
+            if ($otp === false) {
+                js_alert_redirect('Could not prepare email verification. Please try again later.', 'login.php');
+            }
             $_SESSION['temp_email'] = $user['email'];
             send_mail($user['email'], $user['fullname'], 'Verify Your Email - OTP Code',
                       otp_mail_html('Email Verification', $user['fullname'], $otp));
