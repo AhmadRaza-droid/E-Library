@@ -23,9 +23,7 @@ if(isset($_GET['id'])){
         // Local uploads are served as attachments so browsers download the PDF
         // instead of merely opening it in an embedded PDF viewer.
         $isLocalPdf = (bool)preg_match('#^uploads/pdfs/[A-Za-z0-9._-]+$#', $downloadLink);
-        $downloadHref = $isLocalPdf
-            ? 'download_book.php?id=' . $book_id . '&file=1'
-            : $downloadLink;
+        $downloadHref = $downloadLink;
 
         if ($isLocalPdf) {
             $pdfRoot = realpath(__DIR__ . '/uploads/pdfs');
