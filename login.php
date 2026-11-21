@@ -29,9 +29,12 @@ if (isset($_POST['login'])) {
                 js_alert_redirect('Could not prepare email verification. Please try again later.', 'login.php');
             }
             $_SESSION['temp_email'] = $user['email'];
-            send_mail($user['email'], $user['fullname'], 'Verify Your Email - OTP Code',
-                      otp_mail_html('Email Verification', $user['fullname'], $otp));
-            js_alert_redirect('⚠️ Please verify your email first! A new OTP was sent to your inbox.', 'verify_otp.php');
+            $mailSent = send_mail($user['email'], $user['fullname'], 'Verify Your Email - OTP Code',
+                                  otp_mail_html('Email Verification', $user['fullname'], $otp));
+            if ($mailSent) {
+                js_alert_redirect('⚠️ Please verify your email first! A new OTP was sent to your inbox.', 'verify_otp.php');
+            }
+            js_alert_redirect('⚠️ Your account still needs email verification. The OTP could not be emailed; please use Resend OTP or contact support.', 'verify_otp.php');
         }
 
         // transparently upgrade legacy plain-text / old hashes
