@@ -11,18 +11,24 @@ if (is_file($phpMailerAutoload)) {
 }
 
 function make_mailer($keepAlive = false){
+    $smtpUser = cfg('smtp_user', getenv('LIBRARY_SMTP_USERNAME') !== false ? getenv('LIBRARY_SMTP_USERNAME') : '');
+    $smtpPass = cfg('smtp_pass', getenv('LIBRARY_SMTP_PASSWORD') !== false ? getenv('LIBRARY_SMTP_PASSWORD') : '');
+    $smtpHost = cfg('smtp_host', getenv('LIBRARY_SMTP_HOST') !== false ? getenv('LIBRARY_SMTP_HOST') : 'smtp.gmail.com');
+    $smtpPort = (int)cfg('smtp_port', getenv('LIBRARY_SMTP_PORT') !== false ? getenv('LIBRARY_SMTP_PORT') : 587);
+
     $m = new PHPMailer(true);
     $m->isSMTP();
-    $m->Host       = cfg('smtp_host', 'smtp.gmail.com');
+    $m->Host       = $smtpHost;
     $m->SMTPAuth   = true;
-    $m->Username   = cfg('smtp_user', '');
-    $m->Password   = cfg('smtp_pass', '');
-    $m->SMTPSecure = PHPMailer::ENCRYPTION_STARTTLS;
-    $m->Port       = (int)cfg('smtp_port', 587);
+    $m->Username   = $smtpUser;
+    $m->Password   = $smtpPass;
+    // Port 465 requires implicit TLS; 587 normally uses STARTTLS.
+    $m->SMTPSecure = $smtpPort === 465 ? PHPMailer::ENCRYPTION_SMTPS : PHPMailer::ENCRYPTION_STARTTLS;
+    $m->Port       = $smtpPort;
     $m->CharSet    = 'UTF-8';
     $m->Timeout    = 15;
     $m->SMTPKeepAlive = (bool)$keepAlive;
-    $m->setFrom(cfg('smtp_user', ''), cfg('mail_from_name', "Book's Library"));
+    $m->setFrom($smtpUser, cfg('mail_from_name', "Book's Library"));
     return $m;
 }
 
