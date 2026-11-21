@@ -110,6 +110,9 @@ if(mysqli_num_rows($result) > 0){
 while($row = mysqli_fetch_assoc($result)){
 
     $book_id = (int)$row['id'];
+    $readValue = trim((string)($row['read_link'] ?? ''));
+    if ($readValue === '' && $book_id > 0) $readValue = (string)$book_id;
+    $bookReadUrl = resolve_read_link($readValue);
     $downloadValue = trim((string)($row['download_epub_link'] ?? ''));
     if ($downloadValue === '' && $book_id > 0) $downloadValue = (string)$book_id;
     $bookDownloadUrl = resolve_download_link($downloadValue);
@@ -168,9 +171,13 @@ if($totalReviews > 0){
 
 <div class="book-buttons">
 
-<a href="read_book.php?id=<?php echo $row['id']; ?>">
+<?php if ($bookReadUrl !== ''): ?>
+<a href="read_book.php?id=<?php echo $book_id; ?>">
     <button>Read Book</button>
 </a>
+<?php else: ?>
+<button type="button" disabled title="No reading link is available">Reading unavailable</button>
+<?php endif; ?>
 
 <?php if ($bookDownloadUrl !== ''): ?>
 <a href="download_book.php?id=<?php echo $book_id; ?>" target="_blank" rel="noopener noreferrer">
