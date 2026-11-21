@@ -334,7 +334,11 @@ function generate_otp(){ return (string)random_int(100000, 999999); }
 function otp_issue($conn, $email){
     $otp = generate_otp();
     $expiry = date('Y-m-d H:i:s', time() + 600);
-    db_exec($conn, "UPDATE users SET otp=?, otp_expiry=? WHERE email=?", 'sss', [$otp, $expiry, $email]);
+    $saved = db_exec($conn, "UPDATE users SET otp=?, otp_expiry=? WHERE email=?", 'sss', [$otp, $expiry, $email]);
+    if ($saved !== 1) {
+        error_log('OTP could not be stored for an account.');
+        return false;
+    }
     rate_limit_reset('otp_try:' . strtolower($email));
     return $otp;
 }
