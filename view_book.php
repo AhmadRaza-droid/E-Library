@@ -8,7 +8,9 @@ if ($book_id <= 0) { redirect('books.php'); }
 $book = db_row($conn, "SELECT * FROM books WHERE id=?", 'i', [$book_id]);
 if (!$book) { redirect('books.php'); }
 
-$readLink = resolve_read_link($book['read_link']);
-if ($readLink === '') { redirect('books.php'); }   // never redirect to javascript:/data: or malformed URLs
+$readValue = trim((string)($book['read_link'] ?? ''));
+if ($readValue === '' && (int)$book['id'] > 0) $readValue = (string)(int)$book['id'];
+$readLink = resolve_read_link($readValue);
+if ($readLink === '') { redirect('books.php'); }   // never redirect to search, javascript:/data: or malformed URLs
 // Keep older book links within the site reader.
 redirect('read_book.php?id=' . $book_id);
