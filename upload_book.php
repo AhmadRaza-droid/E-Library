@@ -102,6 +102,7 @@ if (isset($_POST['upload'])) {
             $success = $inserted . ' book(s) uploaded successfully.';
             js_alert_redirect($success, 'admin_dashboard.php?page=all_books');
         } else {
+            if ($transactionStarted) $conn->rollback();
             if ($coverPath !== '') @unlink(__DIR__ . '/' . $coverPath);
             $error = 'Please select at least one PDF file.';
         }
