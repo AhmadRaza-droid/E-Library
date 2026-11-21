@@ -125,13 +125,10 @@ function admin_delete_record($conn, $kind, $id){
     foreach ($children as $table) {
         // Optional activity tables may be absent in older database imports.
         if (in_array($table, ['downloads', 'reading_history'], true)) {
-            $exists = db_query($conn, "SHOW TABLES LIKE ?", 's', [$table]);
-            if ($exists === false) { $conn->rollback(); return false; }
-            if ($exists instanceof mysqli_result) {
-                $found = $exists->fetch_row();
-                $exists->free();
-                if (!$found) continue;
-            }
+            $exists = (int)db_value($conn,
+                "SELECT COUNT(*) FROM INFORMATION_SCHEMA.TABLES WHERE TABLE_SCHEMA=DATABASE() AND TABLE_NAME=?",
+                's', [$table], 0);
+            if ($exists === 0) continue;
         }
         if (db_exec($conn, "DELETE FROM `$table` WHERE `$column`=?", 'i', [(int)$id]) === false) {
             $conn->rollback();
