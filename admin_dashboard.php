@@ -326,6 +326,7 @@ $book_requests = mysqli_query($conn,
     <a href="?page=reviews" class="<?php echo $page == 'reviews' ? 'active' : ''; ?>">⭐ Reviews</a>
     <a href="admin_analytics.php">📊 Analytics</a>
     <a href="admin_audit_logs.php">🧾 Audit Log</a>
+    <a href="admin_user_activity.php">👥 User Activity</a>
     <a href="admin_settings.php">⚙️ Settings</a>
     <a href="admin_backup.php">💾 Backup</a>
     <a href="performance.php">🚀 Performance</a>
