@@ -44,17 +44,31 @@ function normalize_import_book($row){
     if (!is_array($row) || !isset($row['id'], $row['title']) || !is_numeric($row['id']) || (int)$row['id'] <= 0 || !is_string($row['title']) || trim($row['title']) === '' || ($row['copyright'] ?? true) !== false) return null;
     $formats = $row['formats'] ?? [];
     if (!is_array($formats) || !is_array($row['authors'] ?? null) || !is_array($row['subjects'] ?? null)) return null;
-    $html = '';
-    foreach ($formats as $mime => $url) {
-        if (str_starts_with($mime, 'text/html') && is_string($url) && safe_url($url) !== '') { $html = $url; break; }
+    // Prefer the formatted HTML reader, but accept Gutenberg plain text when
+    // a title has no HTML edition. Never import a search page as a book file.
+    $reader = '';
+    foreach (['text/html; charset=utf-8', 'text/html', 'text/plain; charset=utf-8', 'text/plain'] as $mime) {
+        $url = $formats[$mime] ?? '';
+        if (is_string($url) && safe_url($url) !== '') { $reader = $url; break; }
     }
-    if ($html === '') return null;
+    if ($reader === '') {
+        foreach ($formats as $mime => $url) {
+            if (str_starts_with(strtolower((string)$mime), 'text/html') || str_starts_with(strtolower((string)$mime), 'text/plain')) {
+                if (is_string($url) && safe_url($url) !== '') { $reader = $url; break; }
+            }
+        }
+    }
+    if ($reader === '') return null;
     $authors = [];
     foreach ($row['authors'] as $author) if (is_array($author) && is_string($author['name'] ?? null)) $authors[] = $author['name'];
     $subjects = array_filter($row['subjects'], 'is_string');
     return ['title' => mb_substr($row['title'], 0, 255), 'author' => mb_substr(implode(', ', $authors) ?: 'Unknown author', 0, 255),
         'category' => mb_substr(implode(', ', $subjects), 0, 255), 'description' => implode('; ', $subjects),
         'cover' => is_string($formats['image/jpeg'] ?? null) ? $formats['image/jpeg'] : '',
-        'read' => (string)(int)$row['id'], 'download' => is_string($formats['application/epub+zip'] ?? null) ? $formats['application/epub+zip'] : '',
+        'read' => $reader,
+        // Gutenberg's stable ebook ID lets the download endpoint construct its EPUB URL
+        // when Gutendex does not list an EPUB MIME format for this title.
+        'download' => is_string($formats['application/epub+zip'] ?? null) && safe_url($formats['application/epub+zip']) !== ''
+            ? $formats['application/epub+zip'] : (string)(int)$row['id'],
         'source' => 'Project Gutenberg'];
 }
