@@ -11,7 +11,7 @@ if (isset($_POST['submit_review'])) {
     $rating  = (int)($_POST['rating'] ?? 0);
     $review  = trim((string)($_POST['review'] ?? ''));
 
-    if ($book_id <= 0 || $rating < 1 || $rating > 5 || mb_strlen($review) > 2000
+    if ($book_id <= 0 || $rating < 1 || $rating > 5 || $review === '' || mb_strlen($review) > 2000
         || !db_row($conn, "SELECT id FROM books WHERE id=?", 'i', [$book_id])) {
         js_alert_redirect('Please choose a valid book and rating, and keep your review under 2,000 characters.', 'books.php');
     }
