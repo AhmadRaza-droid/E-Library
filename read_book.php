@@ -254,9 +254,9 @@ if (isset($_SESSION['user_id'])) {
                 <option value="100" <?php echo $current_progress == 100 ? 'selected' : ''; ?>>100%</option>
             </select>
             
-            <button class="btn-save" onclick="saveProgress()">💾 Save Progress</button>
+            <button type="button" id="save-progress-btn" class="btn-save" onclick="saveProgress()">💾 Save Progress</button>
             
-            <span id="current-progress" style="color:#28a745;font-weight:bold;">Current: <?php echo $current_progress; ?>%</span>
+            <span id="current-progress" role="status" aria-live="polite" style="color:#28a745;font-weight:bold;">Current: <?php echo $current_progress; ?>%</span>
         </div>
     </div>
 
@@ -288,31 +288,43 @@ if (isset($_SESSION['user_id'])) {
 
 <script>
 
-function saveProgress(){
-    let book_id = document.getElementById('book_id').value;
-    let progress = document.getElementById('progress_select').value;
-    
-    fetch('update_progress.php', {
-        method: 'POST',
-        headers: {
-            'Content-Type': 'application/x-www-form-urlencoded',
-            'X-CSRF-Token': <?php echo json_encode(csrf_token()); ?>
-        },
-        credentials: 'same-origin',
-        body: 'book_id=' + encodeURIComponent(book_id) + '&progress=' + encodeURIComponent(progress)
-    })
-    .then(response => response.json())
-    .then(data => {
-        if(data.status === 'success'){
-            document.getElementById('current-progress').textContent = 'Current: ' + progress + '%';
-            showNotification('✅ Progress saved: ' + progress + '%', 'success');
-        } else {
-            showNotification('❌ Error saving progress: ' + data.message, 'error');
+async function saveProgress(){
+    const bookInput = document.getElementById('book_id');
+    const progressSelect = document.getElementById('progress_select');
+    const saveButton = document.getElementById('save-progress-btn');
+    const status = document.getElementById('current-progress');
+    if (!bookInput || !progressSelect || !saveButton || !status) return;
+
+    const book_id = bookInput.value;
+    const progress = progressSelect.value;
+    saveButton.disabled = true;
+    saveButton.textContent = 'Saving...';
+    status.textContent = 'Saving progress...';
+
+    try {
+        const response = await fetch('update_progress.php', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/x-www-form-urlencoded',
+                'X-CSRF-Token': <?php echo json_encode(csrf_token()); ?>,
+                'Accept': 'application/json'
+            },
+            credentials: 'same-origin',
+            body: new URLSearchParams({book_id, progress}).toString()
+        });
+        const data = await response.json();
+        if (!response.ok || data.status !== 'success') {
+            throw new Error(data.message || 'Unable to save progress.');
         }
-    })
-    .catch(error => {
-        showNotification('❌ Error: ' + error, 'error');
-    });
+        status.textContent = 'Saved: ' + data.progress + '%';
+        showNotification('Progress saved: ' + data.progress + '%', 'success');
+    } catch (error) {
+        status.textContent = 'Not saved — please try again.';
+        showNotification('Error saving progress: ' + error.message, 'error');
+    } finally {
+        saveButton.disabled = false;
+        saveButton.textContent = '💾 Save Progress';
+    }
 }
 
 // Dark Mode
