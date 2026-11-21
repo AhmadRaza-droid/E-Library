@@ -23,6 +23,7 @@
 
 ## User features and administration
 - [ ] Favorites, reviews, bookmarks, progress and history work.
+- [ ] Clear All History removes recent views, progress, reading history and download activity for only the current user.
 - [ ] Removing a bookmark affects only the signed-in user's bookmark.
 - [ ] Admin book/user deletion cleans dependent activity records.
 - [ ] Test admin backup and restore on a disposable staging database.
