@@ -20,6 +20,13 @@ if(isset($_GET['id'])){
             js_alert_redirect('Sorry, no download is available for this book.', 'books.php');
         }
 
+        // Local uploads are served as attachments so browsers download the PDF
+        // instead of merely opening it in an embedded PDF viewer.
+        $isLocalPdf = (bool)preg_match('#^uploads/pdfs/[A-Za-z0-9._-]+$#', $downloadLink);
+        $downloadHref = $isLocalPdf
+            ? 'download_book.php?id=' . $book_id . '&file=1'
+            : $downloadLink;
+
         // count each book once per browser session (page refreshes no longer inflate the counter)
         if(empty($_SESSION['dl_counted'][$book_id])){
             $_SESSION['dl_counted'][$book_id] = true;
@@ -31,9 +38,26 @@ if(isset($_GET['id'])){
             }
         }
 
+        if ($isLocalPdf && (string)($_GET['file'] ?? '') === '1') {
+            $pdfRoot = realpath(__DIR__ . '/uploads/pdfs');
+            $pdfPath = realpath(__DIR__ . '/' . $downloadLink);
+            if ($pdfRoot === false || $pdfPath === false
+                || !str_starts_with($pdfPath, $pdfRoot . DIRECTORY_SEPARATOR)
+                || !is_file($pdfPath) || !is_readable($pdfPath)) {
+                http_response_code(404);
+                exit('The PDF file could not be found.');
+            }
+            header('Content-Type: application/pdf');
+            header('Content-Disposition: attachment; filename="book-' . $book_id . '.pdf"');
+            header('Content-Length: ' . (string)filesize($pdfPath));
+            header('X-Content-Type-Options: nosniff');
+            readfile($pdfPath);
+            exit();
+        }
+
         $book_title  = $book['title'];
         $book_author = $book['author'];
-        $downloadLink = e($downloadLink);   // it is printed inside an HTML attribute below
+        $downloadHref = e($downloadHref);   // escaped for the popup link
 
         // ========== SHOW POPUP BEFORE DOWNLOAD ==========
         echo "<!DOCTYPE html>
@@ -277,7 +301,7 @@ if(isset($_GET['id'])){
     </div>
     
     <div class=\"btn-group\">
-        <a href=\"$downloadLink\" target=\"_blank\">
+        <a href=\"$downloadHref\" target=\"_blank\" rel=\"noopener noreferrer\">
             <button class=\"btn-download-now\">📥 Download Book File</button>
         </a>
     </div>
