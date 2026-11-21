@@ -16,6 +16,14 @@ if ($readValue === '' && (int)$book['id'] > 0) {
     $readValue = (string)(int)$book['id'];
 }
 $readUrl = resolve_read_link($readValue);   // only http(s) / our own uploads
+
+// Resolve downloads for local PDF uploads and Gutenberg imports with empty link fields.
+$downloadValue = trim((string)($book['download_epub_link'] ?? ''));
+if ($downloadValue === '' && (int)$book['id'] > 0) {
+    $downloadValue = (string)(int)$book['id'];
+}
+$downloadUrl = resolve_download_link($downloadValue);
+$isLocalPdf = $downloadUrl !== '' && str_starts_with($downloadUrl, 'uploads/pdfs/');
 // Gutenberg's generated HTML marks the end of its introductory metadata.
 $isGutenbergBook = preg_match('#^https://www\.gutenberg\.org/cache/epub/([0-9]+)/pg\1-images\.html$#i', $readUrl) === 1;
 $readerUrl = $isGutenbergBook ? $readUrl . '#pg-start-separator' : $readUrl;
@@ -209,9 +217,9 @@ if (isset($_SESSION['user_id'])) {
             <?php if($isGutenbergBook): ?>
                 <a href="<?php echo e($readUrl . '#pg-header'); ?>" target="book-reader" class="btn-back" style="text-decoration:none;padding:10px 20px;border-radius:8px;">Book details</a>
             <?php endif; ?>
-            <?php if(!empty($book['download_epub_link'])): ?>
-                <a href="download_book.php?id=<?php echo $id; ?>" style="text-decoration:none;">
-                    <button class="btn-download">📥 Download EPUB</button>
+            <?php if($downloadUrl !== ''): ?>
+                <a href="download_book.php?id=<?php echo $id; ?>" class="btn-download" style="display:inline-block;text-decoration:none;padding:12px 20px;border-radius:10px;font-weight:bold;">
+                    📥 Download <?php echo $isLocalPdf ? 'PDF' : 'EPUB'; ?>
                 </a>
             <?php endif; ?>
         </div>
