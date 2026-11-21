@@ -100,7 +100,7 @@ if (isset($_POST['scrape'])) {
 
 <section class="page-header">
     <h1>Auto Import Books</h1>
-    <p>Starter list contains Project Gutenberg classics with online reading and EPUB links. Online search finds more public-domain titles.</p>
+    <p>Starter list contains Project Gutenberg classics with online reading and EPUB links. Online search finds titles marked public domain in the U.S.; check local copyright rules before redistribution.</p>
     <p>Starter categories: science fiction, adventure, history, horror, detective, classic literature, philosophy, poetry.</p>
 </section>
 
