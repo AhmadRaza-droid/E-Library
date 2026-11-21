@@ -3,7 +3,7 @@
 ## Credentials
 Copy `config.local.example.php` to `config.local.php` on the hosting account and replace placeholders with the new database and SMTP credentials. Never commit that file. Rotate any credentials previously committed to public Git history; deleting a file in a new commit does not remove old history.
 
-Environment variables are also supported by the app's configuration layer where configured: DB_HOST, DB_USER, DB_PASS, DB_NAME, SMTP_HOST, SMTP_PORT, SMTP_USER and SMTP_PASS.
+Environment variables are also supported by the app's configuration layer: DB_HOST, DB_USER, DB_PASS, DB_NAME, SMTP_HOST, SMTP_PORT, SMTP_USER and SMTP_PASS. For hosting panels that use the library-specific names, LIBRARY_SMTP_USERNAME, LIBRARY_SMTP_PASSWORD, LIBRARY_SMTP_HOST and LIBRARY_SMTP_PORT are accepted as SMTP fallbacks. Values in config.local.php take priority. Port 587 uses STARTTLS; port 465 uses implicit TLS.
 
 ## PHPMailer
 Run `composer install --no-dev --optimize-autoloader` locally, then upload the generated `vendor/` folder to the site root with composer.json and composer.lock. Without this dependency and valid SMTP credentials, email/OTP sending cannot work.
