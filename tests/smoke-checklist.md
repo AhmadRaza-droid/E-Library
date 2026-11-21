@@ -24,11 +24,13 @@
 
 ## User features and administration
 - [ ] Favorites, reviews, bookmarks, progress and history work.
+- [ ] Review submission/update and book-request submission/status changes report database failures accurately.
 - [ ] Clear All History removes recent views, progress, reading history and download activity for only the current user.
 - [ ] Removing a bookmark affects only the signed-in user's bookmark.
 - [ ] Admin book/user deletion cleans dependent activity records.
 - [ ] Test admin backup and restore on a disposable staging database.
 - [ ] Test notifications, messages, book requests and student materials.
+- [ ] Enable student materials on a fresh install; verify `uploads/resources/.htaccess` is created before any private file upload.
 - [ ] Test mobile navigation, theme and chatbot in English and Roman Urdu.
 
 ## Hosting checks
