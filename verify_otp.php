@@ -159,12 +159,10 @@ if (isset($_POST['verify'])) {
             <br>
             <button type="submit" name="verify">✅ Verify OTP</button>
         </form>
-        <?php if($type == 'registration'): ?>
         <form method="POST" action="resend_otp.php" style="margin-top:10px;">
 <?php echo csrf_field(); ?>
-            <button type="submit" name="resend" style="width:80%;background:#0b1f3a;">🔁 Resend OTP</button>
+            <button type="submit" name="resend" style="width:80%;background:#0b1f3a;">🔁 Resend <?php echo $type === 'reset' ? 'Password ' : ''; ?>OTP</button>
         </form>
-        <?php endif; ?>
         <div class="back-link">
             <a href="<?php echo ($type == 'registration') ? 'register.php' : 'forgot_password.php'; ?>">
                 ← Back
