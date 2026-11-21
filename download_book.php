@@ -27,17 +27,6 @@ if(isset($_GET['id'])){
             ? 'download_book.php?id=' . $book_id . '&file=1'
             : $downloadLink;
 
-        // count each book once per browser session (page refreshes no longer inflate the counter)
-        if(empty($_SESSION['dl_counted'][$book_id])){
-            $_SESSION['dl_counted'][$book_id] = true;
-            db_exec($conn, "UPDATE books SET download_count = download_count + 1 WHERE id=?", 'i', [$book_id]);
-
-            if(isset($_SESSION['user_id'])){
-                db_exec($conn, "INSERT INTO downloads (user_id, book_id, book_title) VALUES (?, ?, ?)",
-                        'iis', [(int)$_SESSION['user_id'], $book_id, $book['title']]);
-            }
-        }
-
         if ($isLocalPdf) {
             $pdfRoot = realpath(__DIR__ . '/uploads/pdfs');
             $pdfPath = realpath(__DIR__ . '/' . $downloadLink);
@@ -47,12 +36,31 @@ if(isset($_GET['id'])){
                 http_response_code(404);
                 exit('The PDF file could not be found.');
             }
+            // Count only after confirming the local file really exists.
+            if (empty($_SESSION['dl_counted'][$book_id])) {
+                $_SESSION['dl_counted'][$book_id] = true;
+                db_exec($conn, "UPDATE books SET download_count = download_count + 1 WHERE id=?", 'i', [$book_id]);
+                if (isset($_SESSION['user_id'])) {
+                    db_exec($conn, "INSERT INTO downloads (user_id, book_id, book_title) VALUES (?, ?, ?)",
+                        'iis', [(int)$_SESSION['user_id'], $book_id, $book['title']]);
+                }
+            }
             header('Content-Type: application/pdf');
             header('Content-Disposition: attachment; filename="book-' . $book_id . '.pdf"');
             header('Content-Length: ' . (string)filesize($pdfPath));
             header('X-Content-Type-Options: nosniff');
             readfile($pdfPath);
             exit();
+        }
+
+        // Remote EPUB links use the confirmation popup; count the request once per session.
+        if (empty($_SESSION['dl_counted'][$book_id])) {
+            $_SESSION['dl_counted'][$book_id] = true;
+            db_exec($conn, "UPDATE books SET download_count = download_count + 1 WHERE id=?", 'i', [$book_id]);
+            if (isset($_SESSION['user_id'])) {
+                db_exec($conn, "INSERT INTO downloads (user_id, book_id, book_title) VALUES (?, ?, ?)",
+                    'iis', [(int)$_SESSION['user_id'], $book_id, $book['title']]);
+            }
         }
 
         $book_title  = $book['title'];
