@@ -381,7 +381,8 @@ $book_requests = mysqli_query($conn,
             <?php while($row = mysqli_fetch_assoc($books)){ ?>
             <tr>
                 <td><?php echo $row['id']; ?></td>
-                <td><img src="<?php echo htmlspecialchars($row['cover_image_url']); ?>" width="50" style="border-radius:5px;"></td>
+                <?php $adminCover = safe_url($row['cover_image_url'] ?? '') ?: (safe_url($row['cover_file'] ?? '') ?: safe_url($row['image'] ?? '')); ?>
+                <td><?php if ($adminCover !== ''): ?><img src="<?php echo e($adminCover); ?>" width="50" alt="Book cover" style="border-radius:5px;"><?php else: ?>📚<?php endif; ?></td>
                 <td><?php echo htmlspecialchars($row['title']); ?></td>
                 <td><?php echo htmlspecialchars($row['author']); ?></td>
                 <td><?php echo htmlspecialchars($row['category'] ?? 'N/A'); ?></td>
