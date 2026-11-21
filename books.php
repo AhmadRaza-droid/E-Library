@@ -138,6 +138,7 @@ while($row = mysqli_fetch_assoc($result)){
 <?php
 $coverPath = safe_url($row['cover_image_url'] ?? '');
 if ($coverPath === '') $coverPath = safe_url($row['cover_file'] ?? '');
+if ($coverPath === '') $coverPath = safe_url($row['image'] ?? ''); // legacy Project Gutenberg imports
 ?>
 <?php if ($coverPath !== ''): ?>
 <img src="<?php echo e($coverPath); ?>" alt="Cover of <?php echo e($row['title'] ?? 'book'); ?>" loading="lazy" onerror="this.hidden=true;this.nextElementSibling.hidden=false;">
