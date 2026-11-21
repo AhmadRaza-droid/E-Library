@@ -7,6 +7,7 @@ if ($summaryRequest) {
 }
 require_once __DIR__ . '/config.php';
 require_once __DIR__ . '/student_resources.php';
+require_once __DIR__ . '/audit.php';
 header('Cache-Control: private, no-store');
 if ($summaryRequest) {
     if ($lastInteraction !== null) $_SESSION['LAST_ACTIVITY'] = $lastInteraction;
@@ -21,6 +22,7 @@ $ready = resources_ready($conn);
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     if (isset($_POST['enable_resources'])) {
         $ok = resources_install($conn);
+        if ($ok) audit_log($conn, 'Enable student materials', 'Enabled student resource submissions and moderation.');
         js_alert_redirect($ok ? 'Student materials enabled. Students can now submit files for review.' : 'Could not enable student materials. Check that the uploads folder is writable and the database account can create tables.', 'admin_resources.php');
     }
     if (!$ready) js_alert_redirect('Enable student materials first.', 'admin_resources.php');
@@ -39,6 +41,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 error_log('Student material file cleanup failed for record ' . $id);
                 js_alert_redirect('Material removed. Its private file could not be deleted from storage; check server permissions.', 'admin_resources.php');
             }
+            audit_log($conn, 'Delete student material', 'Deleted student material record ID ' . $id . ' and its stored file.');
             js_alert_redirect('Material and its file deleted.', 'admin_resources.php');
         }
         $conn->rollback();
@@ -46,6 +49,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     }
     if ($decision === 'reject' && $reason === '') js_alert_redirect('Add feedback so the student knows why the file was rejected or unpublished.', 'admin_resources.php');
     $ok = resource_moderate($conn, $id, (int)$_SESSION['admin_id'], $decision, $reason);
+    if ($ok) audit_log($conn, 'Moderate student material', 'Material ID ' . $id . ' decision: ' . $decision . ($reason !== '' ? ' | Note: ' . $reason : ''));
     js_alert_redirect($ok ? ($decision === 'approve' ? 'Material approved and published.' : 'Material rejected / unpublished. The student can see your feedback.')
         : 'No change made. The material may already have been reviewed. Refresh and check its status.', 'admin_resources.php');
 }
