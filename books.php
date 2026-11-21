@@ -110,6 +110,10 @@ if(mysqli_num_rows($result) > 0){
 while($row = mysqli_fetch_assoc($result)){
 
     $book_id = (int)$row['id'];
+    $downloadValue = trim((string)($row['download_epub_link'] ?? ''));
+    if ($downloadValue === '' && $book_id > 0) $downloadValue = (string)$book_id;
+    $bookDownloadUrl = resolve_download_link($downloadValue);
+    $isLocalPdf = $bookDownloadUrl !== '' && str_starts_with($bookDownloadUrl, 'uploads/pdfs/');
 
     $reviewData = db_row($conn,
         "SELECT AVG(rating) AS avg_rating, COUNT(*) AS total_reviews FROM reviews WHERE book_id=?", 'i', [$book_id]);
@@ -168,9 +172,13 @@ if($totalReviews > 0){
     <button>Read Book</button>
 </a>
 
-<a href="download_book.php?id=<?php echo $row['id']; ?>" target="_blank">
-    <button>Download EPUB</button>
+<?php if ($bookDownloadUrl !== ''): ?>
+<a href="download_book.php?id=<?php echo $book_id; ?>" target="_blank" rel="noopener noreferrer">
+    <button>Download <?php echo $isLocalPdf ? 'PDF' : 'EPUB'; ?></button>
 </a>
+<?php else: ?>
+<button type="button" disabled title="No download file is available">Download unavailable</button>
+<?php endif; ?>
 
 <?php if(isset($_SESSION['user_id'])){ ?>
     <form method="POST" action="favorite_book.php" style="display:inline;">
