@@ -105,18 +105,23 @@ function db_value($conn, $sql, $types = '', $params = [], $default = null){
 /** Delete an admin-managed record and its existing dependent records atomically. */
 function admin_delete_record($conn, $kind, $id){
     $relations = [
-        'book' => ['books', 'book_id', ['favorites', 'reviews', 'recently_viewed', 'bookmarks', 'reading_progress']],
-        'user' => ['users', 'user_id', ['favorites', 'recently_viewed', 'reviews', 'bookmarks', 'reading_progress', 'book_requests']],
+        'book' => ['books', 'book_id', ['favorites', 'reviews', 'recently_viewed', 'bookmarks', 'reading_progress', 'downloads', 'reading_history']],
+        'user' => ['users', 'user_id', ['favorites', 'recently_viewed', 'reviews', 'bookmarks', 'reading_progress', 'book_requests', 'downloads', 'reading_history']],
     ];
     if (!isset($relations[$kind]) || (int)$id <= 0 || !$conn->begin_transaction()) return false;
     [$parent, $column, $children] = $relations[$kind];
-    $result = db_query($conn, "SELECT id FROM `$parent` WHERE id=? FOR UPDATE", 'i', [(int)$id]);
-    if (!$result instanceof mysqli_result || !$result->fetch_assoc()) {
-        if ($result instanceof mysqli_result) $result->free();
+    $select = $kind === 'book' ? 'id, pdf_file, cover_file' : 'id';
+    $result = db_query($conn, "SELECT $select FROM `$parent` WHERE id=? FOR UPDATE", 'i', [(int)$id]);
+    if (!$result instanceof mysqli_result) {
         $conn->rollback();
         return false;
     }
+    $record = $result->fetch_assoc();
     $result->free();
+    if (!$record) {
+        $conn->rollback();
+        return false;
+    }
     foreach ($children as $table) {
         if (db_exec($conn, "DELETE FROM `$table` WHERE `$column`=?", 'i', [(int)$id]) === false) {
             $conn->rollback();
@@ -126,6 +131,22 @@ function admin_delete_record($conn, $kind, $id){
     if (db_exec($conn, "DELETE FROM `$parent` WHERE id=?", 'i', [(int)$id]) !== 1 || !$conn->commit()) {
         $conn->rollback();
         return false;
+    }
+
+    // Remove uploaded book files only after the database deletion commits.
+    // Shared cover files are kept while another book still references them.
+    if ($kind === 'book') {
+        foreach (['pdf_file' => 'pdfs', 'cover_file' => 'covers'] as $field => $folder) {
+            $relative = (string)($record[$field] ?? '');
+            if (!preg_match('#^uploads/' . $folder . '/[A-Za-z0-9._-]+$#', $relative)) continue;
+            $references = db_row($conn, "SELECT id FROM books WHERE pdf_file=? OR cover_file=? LIMIT 1", 'ss', [$relative, $relative]);
+            if ($references !== null) continue; // keep shared files or files when reference lookup fails
+            $base = realpath(__DIR__ . '/uploads/' . $folder);
+            $file = realpath(__DIR__ . '/' . $relative);
+            if ($base !== false && $file !== false && str_starts_with($file, $base . DIRECTORY_SEPARATOR) && is_file($file)) {
+                @unlink($file);
+            }
+        }
     }
     return true;
 }
