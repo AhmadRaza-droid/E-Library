@@ -214,6 +214,9 @@ if (isset($_SESSION['user_id'])) {
         </div>
         <div style="display:flex;gap:10px;flex-wrap:wrap;">
             <a href="books.php" class="btn-back" style="text-decoration:none;padding:10px 20px;border-radius:8px;">📚 Books</a>
+            <?php if($readUrl !== ''): ?>
+                <a href="<?php echo e($readUrl); ?>" target="_blank" rel="noopener noreferrer" class="btn-back" style="text-decoration:none;padding:10px 20px;border-radius:8px;">↗ Open in new tab</a>
+            <?php endif; ?>
             <?php if($isGutenbergBook): ?>
                 <a href="<?php echo e($readUrl . '#pg-header'); ?>" target="book-reader" class="btn-back" style="text-decoration:none;padding:10px 20px;border-radius:8px;">Book details</a>
             <?php endif; ?>
