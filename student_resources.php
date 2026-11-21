@@ -22,7 +22,7 @@ function resources_storage_prepare(){
     } else {
         $current = @file_get_contents($htaccess);
         if (!is_string($current)) return false;
-        if (stripos($current, 'Require all denied') === false && stripos($current, 'Deny from all') === false) {
+        if (!preg_match('/^\\s*(?:Require\\s+all\\s+denied|Deny\\s+from\\s+all)\\s*$/mi', $current)) {
             if (@file_put_contents($htaccess, "\n" . $rules, FILE_APPEND | LOCK_EX) === false) return false;
         }
     }
