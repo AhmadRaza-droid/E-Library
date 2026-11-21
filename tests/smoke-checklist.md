@@ -14,6 +14,7 @@
 - [ ] Search/import an online public-domain book; confirm HTML or plain-text reading works.
 - [ ] Confirm EPUB download uses the supplied EPUB URL or Gutenberg ID fallback.
 - [ ] Confirm duplicate imports are skipped and database lookup failures are reported as failed.
+- [ ] Confirm old catalogue/search-page URLs are not shown as working book readers or downloads.
 - [ ] Upload one PDF and multiple PDFs with covers; confirm each book opens.
 - [ ] Confirm local PDF download starts as a file download, not only an in-browser preview.
 - [ ] Reject invalid file types, oversized files and malformed uploads.
