@@ -21,7 +21,7 @@ $ready = resources_ready($conn);
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     if (isset($_POST['enable_resources'])) {
         $ok = resources_install($conn);
-        js_alert_redirect($ok ? 'Student materials enabled. Students can now submit files for review.' : 'Could not enable student materials. Ask your host to check database CREATE TABLE permission.', 'admin_resources.php');
+        js_alert_redirect($ok ? 'Student materials enabled. Students can now submit files for review.' : 'Could not enable student materials. Check that the uploads folder is writable and the database account can create tables.', 'admin_resources.php');
     }
     if (!$ready) js_alert_redirect('Enable student materials first.', 'admin_resources.php');
     $id = filter_var($_POST['resource_id'] ?? null, FILTER_VALIDATE_INT, ['options'=>['min_range'=>1]]);
